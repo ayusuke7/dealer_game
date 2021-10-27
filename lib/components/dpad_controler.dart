@@ -64,9 +64,7 @@ class FocusContainerState extends State<FocusContainer> {
           event.data is RawKeyEventDataAndroid
         ) {
             switch (event.logicalKey.keyLabel) {
-              case "Enter":
               case "Select":
-              case "Space":
                 widget.onClick!();
                 break;
               case "Arrow Up":

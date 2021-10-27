@@ -1,15 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:network_info_plus/network_info_plus.dart';
-
 import '/io/message.dart';
-
 class Server {
-  final network = NetworkInfo();
 
-  Function(Message) onData;
-  Function(String) onError;
+  final Function(Message) onData;
+  final Function(String) onError;
+  final String host;
 
   ServerSocket? server;
   bool running = false;
@@ -18,14 +15,12 @@ class Server {
   Server({
     required this.onData,
     required this.onError,
+    required this.host
   });
 
   Future<void> start() async {
     try {
-      var host = await network.getWifiIP();
-      
-      server = await ServerSocket.bind(host, 4444);
-      
+      server = await ServerSocket.bind(host, 4444);      
       server?.listen((Socket socket){
         socket.listen((Uint8List uint8){
           var data = String.fromCharCodes(uint8);
@@ -45,7 +40,8 @@ class Server {
       });
       this.running = true;
       print('Server listening on $host:4444');
-    } on Exception catch (ex) {
+
+    } catch (ex) {
       print(ex);
       this.running = false;
       this.onError("Error ao iniciar o Servidor!!");

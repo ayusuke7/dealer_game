@@ -62,6 +62,9 @@ flutter:
     - family: Gameria
       fonts:
         - asset: assets/fonts/gameria.ttf
+    - family: Rimouski
+      fonts:
+        - asset: assets/fonts/rimouski.otf
 
   #   - family: Trajan Pro
   #     fonts:

@@ -302,22 +302,19 @@ class _GameTrucoState extends State<GameTruco> {
             ),
           ),
           Container(
-            constraints: BoxConstraints(
-              maxWidth: 300
-            ),
+            width: 300,
             color: Colors.green[800],
             padding: EdgeInsets.all(20.0),
-            child: ListView(
+            child: Column(
               children: [
                 CardGame(
-                  width: 130,
+                  width: 100,
                   card: vira, 
                   visible: visible,
                 ),
-                Container(
-                  width: double.maxFinite,
-                  margin: EdgeInsets.fromLTRB(10, 20, 10, 20),
-                  child: Column(
+                Expanded(                  
+                  child: ListView(
+                    padding: EdgeInsets.fromLTRB(10, 20, 10, 20),
                     children: [
                       Divider(color: Colors.white),
                       Text("Placar", style: TextStyle(
@@ -362,18 +359,6 @@ class _GameTrucoState extends State<GameTruco> {
                       )),
                       const SizedBox(height: 7.0),
                       ListTile(
-                        title: Text("Jogador da Vez", 
-                          style: TextStyle(
-                            color: Colors.white,
-                          )
-                        ),
-                        trailing: Text("$vez", style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold
-                        )),
-                      ),
-                      ListTile(
                         title: Text("Mão Valendo", 
                           style: TextStyle(
                             color: Colors.white,
@@ -399,14 +384,17 @@ class _GameTrucoState extends State<GameTruco> {
                   ),
                 ),
                 ElevatedButton(
+                  child: Text("SAIR DO JOGO", style: TextStyle(
+                    color: Colors.white
+                  )),
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.all(20),
-                    fixedSize: Size(double.maxFinite, 40),
+                    fixedSize: Size(280, 50),
+                    primary: Colors.red,
                   ),
                   onPressed: (){
                     Navigator.of(context).pop();
                   }, 
-                  child: Text("SAIR DO JOGO")
+                  
                 ),
               ],
             ),

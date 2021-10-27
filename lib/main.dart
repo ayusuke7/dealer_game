@@ -20,6 +20,24 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Truco',
       theme: ThemeData(
         primarySwatch: Colors.green,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            overlayColor: MaterialStateProperty.all<Color>(
+              Colors.black.withOpacity(0.095)
+            ),
+            shape: MaterialStateProperty.resolveWith<OutlinedBorder>((states) {
+              if(states.contains(MaterialState.focused)){
+                return RoundedRectangleBorder(
+                  side: BorderSide(color: Colors.yellow, width: 4.5),
+                  borderRadius: BorderRadius.circular(10),
+                );
+              }
+              return RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10)
+              );
+            })
+          )
+        )
       ),
       home: MenuPage(),
     );

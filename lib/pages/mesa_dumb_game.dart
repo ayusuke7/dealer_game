@@ -7,6 +7,7 @@ import 'package:flutter_truco/models/mesa.dart';
 import 'package:flutter_truco/models/player.dart';
 import 'package:flutter_truco/utils/dealer.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:network_info_plus/network_info_plus.dart';
 
 class DumbGame extends StatefulWidget {
   const DumbGame({ Key? key }) : super(key: key);
@@ -15,6 +16,8 @@ class DumbGame extends StatefulWidget {
 }
 
 class _DumbGameState extends State<DumbGame> {
+  final network = NetworkInfo();
+  TextEditingController edit = TextEditingController();
 
   MesaModel mesa = MesaModel();
 
@@ -94,21 +97,28 @@ class _DumbGameState extends State<DumbGame> {
     _sendBroadcastMesa();
   }
 
-  void _createServer() async {
-    server = Server(
-      onData: _onDataReceive,
-      onError: (error){
-        Fluttertoast.showToast(
-          msg: error,
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.CENTER
-        );
-      }
-    );
+  void _createServer([String? ip]) async {
+    var ipServer = ip ?? await network.getWifiIP();
 
-    await server?.start();
-
-    setState(() => host = server?.server?.address.host);
+    if(ipServer != null){
+      server = Server(
+        host: ipServer,
+        onData: _onDataReceive,
+        onError: (error){
+          Fluttertoast.showToast(
+            msg: error,
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.CENTER
+          );
+        }
+      );
+      await server?.start();
+      setState(() {
+        host = server?.server?.address.host;
+      });
+    }else{
+      _showInputIpServer();
+    }
   }
 
   void _onDataReceive(Message message){
@@ -201,6 +211,54 @@ class _DumbGameState extends State<DumbGame> {
 
   }
   
+  void _showInputIpServer(){
+    showDialog(
+      barrierDismissible: false,
+        context: context, 
+        builder: (ctx){
+          return SimpleDialog(
+            contentPadding: EdgeInsets.all(20),
+            children: [
+              Text("Não foi possivel configurar o IP do Servidor!\nPor favor, Informe manualmente!",
+                style: TextStyle(fontSize: 18, height: 1.4),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 20),
+                child: TextFormField(
+                  controller: edit,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    fillColor: Colors.white,
+                    focusColor: Colors.white,
+                    filled: true,
+                    hintText: "Ex: 192.169.1.2",
+                    border: OutlineInputBorder()
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.blue,
+                  fixedSize: Size(200, 60),
+                  textStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18
+                  ),
+                ),
+                child: Text("Iniciar Servidor"),
+                onPressed: (){
+                  if(edit.text.isNotEmpty){
+                    Navigator.of(ctx).pop();
+                    _createServer(edit.text);
+                  }
+                }, 
+              )
+            ],
+          );
+        }
+      );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -242,7 +300,7 @@ class _DumbGameState extends State<DumbGame> {
                           style: TextStyle(color: Colors.white,fontSize: 16)
                         ),
                         const SizedBox(height: 10),
-                        Text("Servidor $host",
+                        Text(host != null ? "Servidor $host" : "",
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white,fontSize: 16)
                         ),
@@ -305,7 +363,7 @@ class _DumbGameState extends State<DumbGame> {
               child: Column(
                 children: [
                   CardGame(
-                    width: 130,
+                    width: 100,
                     disabled: deck.isEmpty,
                     margin: EdgeInsets.only(top: 10, bottom: 30),
                   ),
@@ -330,7 +388,7 @@ class _DumbGameState extends State<DumbGame> {
                           trailing: Icon(
                             Icons.circle, 
                             size: 20,
-                            color: mesa.running ? Colors.yellow : Colors.red,
+                            color: mesa.running ? Colors.blue : Colors.yellow,
                           ),
                         ),
                         ListTile(
@@ -378,7 +436,8 @@ class _DumbGameState extends State<DumbGame> {
                     ),
                     child: Text("Sair"),
                     onPressed: (){
-                      Navigator.pop(context);
+                      _showInputIpServer();
+                      //Navigator.pop(context);
                     }, 
                   ),
                 ],
