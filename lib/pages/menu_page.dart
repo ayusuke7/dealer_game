@@ -1,10 +1,8 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_truco/components/dpad_controler.dart';
-import 'package:flutter_truco/main.dart';
 import 'package:flutter_truco/pages/mesa_dumb_game.dart';
-import 'package:flutter_truco/pages/player_dumb_page.dart';
 import 'package:flutter_truco/pages/mesa_truco_page.dart';
+import 'package:flutter_truco/pages/player_dumb_page.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({ Key? key }) : super(key: key);
@@ -17,9 +15,27 @@ class _MenuPageState extends State<MenuPage> {
 
   int _node = 1;
 
-  void _nextTo(String route){
+  void _nextToDumbMesa(){
     Navigator.of(context).push(MaterialPageRoute(
       builder: (ctx) => DumbGame()
+    ));
+  }
+  
+  void _nextToDumbPlay(){
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (ctx) => PlayerDumbPage()
+    ));
+  }
+  
+  void _nextToTrucoMesa(){
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (ctx) => GameTruco()
+    ));
+  }
+  
+  void _nextToTrucoPlay(){
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (ctx) => GameTruco()
     ));
   }
   
@@ -76,11 +92,11 @@ class _MenuPageState extends State<MenuPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   InkWell(
-                    onTap: () => _nextTo(MESA_BURRO_PAGE),
+                    onTap: _nextToDumbMesa,
                     enableFeedback: true,
                     child: FocusContainer(
                       autofocus: true,
-                      onClick: () => _nextTo(MESA_BURRO_PAGE),
+                      onClick: _nextToDumbMesa,
                       onFocus: (focus){
                         setState(() => _node = 1);
                       },
@@ -105,11 +121,11 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                   const SizedBox(width: 50),
                   InkWell(
-                    onTap: () => _nextTo(PLAY_BURRO_PAGE),
+                    onTap: _nextToDumbPlay,
                     enableFeedback: true,
                     child: FocusContainer(
                       autofocus: true,
-                      onClick: () => _nextTo(PLAY_BURRO_PAGE),
+                      onClick: _nextToDumbPlay,
                       onFocus: (focus){
                         setState(() => _node = 2);
                       },
@@ -134,9 +150,9 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                   const SizedBox(width: 50),
                   InkWell(
-                    onTap: () => _nextTo(PLAY_TRUCO_PAGE),
+                    onTap: _nextToTrucoMesa,
                     child: FocusContainer(
-                      onClick: () => _nextTo(PLAY_TRUCO_PAGE),
+                      onClick: _nextToTrucoMesa,
                       onFocus: (focus){
                         setState(() => _node = 3);
                       },
@@ -161,9 +177,9 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                   const SizedBox(width: 50),
                   InkWell(
-                    onTap: () => _nextTo(PLAY_TRUCO_PAGE),
+                    onTap: _nextToTrucoPlay,
                     child: FocusContainer(
-                      onClick: () => _nextTo(PLAY_TRUCO_PAGE),
+                      onClick: _nextToTrucoPlay,
                       onFocus: (focus){
                         setState(() => _node = 4);
                       },
