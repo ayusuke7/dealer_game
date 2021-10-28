@@ -60,6 +60,7 @@ class _PlayerTrucoState extends State<PlayerTruco> {
   @override
   Widget build(BuildContext context) {
     var showOpt = widget.vez && _select != null;
+    var size = MediaQuery.of(context).size;
     return RotatedBox(
       quarterTurns: widget.rotate, 
       child: Container(
@@ -99,17 +100,25 @@ class _PlayerTrucoState extends State<PlayerTruco> {
                     color: Colors.white
                   )),
             ),
-            Row(
-              children: widget.player.cards.map((card) {
-                return CardGame(
-                  card: card,
-                  visible: widget.visible,
-                  selected: widget.vez && _select?.uui == card.uui,
-                  onTap: () {
-                    setState(() => _select = card);
-                  },
-                );
-              }).toList()
+            Container(
+              height: size.height / 4.0,
+              constraints: BoxConstraints(
+                maxHeight: showOpt ? 140.0 : 120.0
+              ),
+              child: FittedBox(
+                child: Row(
+                  children: widget.player.cards.map((card) {
+                    return CardGame(
+                      card: card,
+                      visible: widget.visible,
+                      selected: widget.vez && _select?.uui == card.uui,
+                      onTap: () {
+                        setState(() => _select = card);
+                      },
+                    );
+                  }).toList()
+                ),
+              ),
             ),
           ],
         )

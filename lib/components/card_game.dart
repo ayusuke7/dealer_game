@@ -11,7 +11,7 @@ class CardGame extends StatelessWidget {
   final bool disabled;
   final bool selected;
 
-  final Size? size;
+  final double width;
   final EdgeInsets? margin;
   final Function()? onTap;
 
@@ -19,21 +19,22 @@ class CardGame extends StatelessWidget {
     Key? key,
     this.card,
     this.onTap,
+    this.margin,
+    this.width = 100.0,
     this.mark = false,
     this.visible = true,
     this.disabled = false,
     this.selected = false,
-    this.margin,
-    this.size
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     
-    var width = selected ? 120.0 : 100.0;
-    var height = selected ? 180.0 : 160.0;
+    var sWidth = selected ? (width+20) : width;
+    var sHeight = selected ? (width+80) : (width+60);
+
     var flip = (card?.flip ?? card == null) || !visible;
-    var cize = size ?? Size(width, height);
+    var cize = Size(sWidth, sHeight);
 
     return GestureDetector(
       onTap: onTap,
@@ -86,8 +87,8 @@ class CardGame extends StatelessWidget {
       elevation: 5.0,
       margin: margin,
       child: Container(
-        width: selected ? 120 : 100,
-        height: selected ? 180 : 160,
+        width: size.width,
+        height: size.height,
         decoration: BoxDecoration(
           color: mark ? Colors.yellow[100] : Colors.white,
           borderRadius: BorderRadius.circular(8)
@@ -119,8 +120,8 @@ class CardGame extends StatelessWidget {
       elevation: 5.0,
       margin: margin,
       child: Container(
-        width: selected ? 120 : 100,
-        height: selected ? 180 : 160,
+        width: size.width,
+        height: size.height,
         decoration: BoxDecoration(
           color: Colors.blueGrey[400],
           border: Border.all(width: 2.5, color: Colors.white),

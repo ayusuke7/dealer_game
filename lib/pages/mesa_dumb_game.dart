@@ -358,54 +358,46 @@ class _DumbGameState extends State<DumbGame> {
               width: 280,
               color: Colors.green[800],
               padding: EdgeInsets.all(10.0),
-              child: Column(
+              child: ListView(
                 children: [
                   CardGame(
                     disabled: deck.isEmpty,
                     margin: EdgeInsets.only(top: 10, bottom: 20),
                   ),
-                  
                   Divider(color: Colors.white),
-                  
-                  Expanded(
-                    child: ListView(
-                      children: [
-                        ListTile(
-                          title: Text("Servidor", 
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold
-                            )
-                          ),
-                          subtitle: server != null 
-                            ? Text("$host", style: TextStyle(
-                              color: Colors.white,
-                            )) : null,
-                          trailing: Icon(
-                            Icons.circle, 
-                            size: 20,
-                            color: mesa.running ? Colors.blue : Colors.yellow,
-                          ),
-                        ),
-                        ListTile(
-                          title: Text("Baralho", 
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold
-                            )
-                          ),
-                          trailing: Text("${deck.length}", style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold
-                          )),
-                        ),
-                      ],
+                  ListTile(
+                    title: Text("Servidor", 
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold
+                      )
+                    ),
+                    subtitle: server != null 
+                      ? Text("$host", style: TextStyle(
+                        color: Colors.white,
+                      )) : null,
+                    trailing: Icon(
+                      Icons.circle, 
+                      size: 20,
+                      color: mesa.running ? Colors.blue : Colors.yellow,
                     ),
                   ),
-                  
+                  ListTile(
+                    title: Text("Baralho", 
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold
+                      )
+                    ),
+                    trailing: Text("${deck.length}", style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold
+                    )),
+                  ),
+                  const SizedBox(height: 30),
                   Visibility(
                     visible: players.length > 1,
                     child: ElevatedButton(
@@ -424,7 +416,6 @@ class _DumbGameState extends State<DumbGame> {
                       onPressed: _distribuitionDeck, 
                     ),
                   ),
-
                   Visibility(
                     visible: !mesa.running,
                     child: ElevatedButton(
