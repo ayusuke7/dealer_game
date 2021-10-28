@@ -38,21 +38,19 @@ class _MenuPageState extends State<MenuPage> {
   
   @override
   Widget build(BuildContext context) {
-
     var textStyle = TextStyle(
       color: Colors.white,
       fontFamily: "Gameria",
       fontSize: 26,
     );
 
+
     return Scaffold(
       body: Container(
+        width: double.maxFinite,
         color: Colors.green[600],
-        padding: EdgeInsets.symmetric(
-          horizontal: 50,
-          vertical: 10
-        ),
-        child: Center(
+        padding: EdgeInsets.all(30),
+        child: FittedBox(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -90,7 +88,10 @@ class _MenuPageState extends State<MenuPage> {
                 ],
               ),
               Container(
-                margin: EdgeInsets.only(top: 40, bottom: 20),
+                margin: EdgeInsets.only(
+                  top: 40, 
+                  bottom: 20
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

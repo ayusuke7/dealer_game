@@ -71,34 +71,35 @@ class _PlayerTrucoState extends State<PlayerTruco> {
         ) : null,
         child: Column(
           children: [
-            showOpt 
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton.icon(
-                      onPressed: _onTapCard,
-                      label: Text("Jogar", style: TextStyle(color: Colors.white)),
-                      icon: Icon(Icons.arrow_circle_up, color: Colors.white)
-                    ),
-                    TextButton.icon(
-                      onPressed: _onTapVirar,
-                      label: Text("Virar", style: TextStyle(color: Colors.white)),
-                      icon: Icon(Icons.rotate_left, color: Colors.white)
-                    ),
-                    TextButton.icon(
-                      onPressed: _onTapTrucar,
-                      label: Text("Trucar", style: TextStyle(color: Colors.white)),
-                      icon: Icon(Icons.bolt, color: Colors.white)
-                    )
-                  ],
-                )
-              : Text(widget.player.name, style: TextStyle(
-                  fontSize: 16, 
-                  color: Colors.white
-                )),
-            const SizedBox(height: 10.0),
-            Wrap(
-              alignment: WrapAlignment.center,
+            Container(
+              margin: EdgeInsets.only(bottom: 7.0),
+              child: showOpt 
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton.icon(
+                        onPressed: _onTapCard,
+                        label: Text("Jogar", style: TextStyle(color: Colors.white)),
+                        icon: Icon(Icons.arrow_circle_up, color: Colors.white)
+                      ),
+                      TextButton.icon(
+                        onPressed: _onTapVirar,
+                        label: Text("Virar", style: TextStyle(color: Colors.white)),
+                        icon: Icon(Icons.rotate_left, color: Colors.white)
+                      ),
+                      TextButton.icon(
+                        onPressed: _onTapTrucar,
+                        label: Text("Trucar", style: TextStyle(color: Colors.white)),
+                        icon: Icon(Icons.bolt, color: Colors.white)
+                      )
+                    ],
+                  )
+                : Text(widget.player.name, style: TextStyle(
+                    fontSize: 16, 
+                    color: Colors.white
+                  )),
+            ),
+            Row(
               children: widget.player.cards.map((card) {
                 return CardGame(
                   card: card,

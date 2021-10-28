@@ -227,107 +227,101 @@ class _GameTrucoState extends State<GameTruco> {
 
   @override
   Widget build(BuildContext context) {
-
+    var size = MediaQuery.of(context).size;
     var maoOnze = visible && eqp1 != 11 && eqp2 != 11;
 
     return Scaffold(
+      backgroundColor: Colors.green[600],
       body: Row(
         children: [
           Expanded(
-            child: Container(
-              color: Colors.green[600],
-              padding: EdgeInsets.all(10.0),
-              child: Stack(
-                fit: StackFit.expand,
-                alignment: AlignmentDirectional.center,
-                children: [
-                  Positioned(
-                    top: 0,
-                    child: PlayerTruco(
-                      vez: vez == 3,
-                      player: player3,
-                      visible: false,
-                    )
-                  ),
-                  Positioned(
-                    left: 0,
-                    child: PlayerTruco(
-                      rotate: 1,
-                      vez: vez == 2,
-                      player: player2,
-                      visible: false,
-                    )
-                  ), 
-                  Positioned(
-                    right: 0,
-                    child: PlayerTruco(
-                      rotate: 3,
-                      vez: vez == 4,
-                      player: player4,
-                      visible: false,
-                    )
-                  ), 
-                  Positioned(
-                    bottom: 0,
-                    child: PlayerTruco(
-                      vez: vez == 1,
-                      player: player1,
-                      visible: maoOnze,
-                      onTapCard: _onClickCard,
-                      onTapTruco: _onClickTruco,
-                    )
-                  ),
-                  ...jogadas.map((jogada) {
-                    return TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: 0, end: 250),
-                      duration: Duration(milliseconds: 500),
-                      curve: Curves.easeInOut,
-                      builder: (context, value, child) {
-                        return Positioned(
-                          bottom: jogada.player == 1 ? value : null,
-                          left: jogada.player == 2 ? value : null,
-                          top: jogada.player == 3 ? value : null,
-                          right: jogada.player == 4 ? value : null,
-                          child: CardGame(
-                            mark: jogada.uui == winner?.uui,
-                            card: jogada,
-                            width: 100,
-                          ),
-                        );
-                      },
-                    );
-                  }).toList()
-                ],
-              ),
+            child: Stack(
+              fit: StackFit.expand,
+              alignment: AlignmentDirectional.center,
+              children: [
+                Positioned(
+                  top: 10,
+                  child: PlayerTruco(
+                    vez: vez == 3,
+                    player: player3,
+                    visible: false,
+                  )
+                ),
+                Positioned(
+                  left: 10,
+                  child: PlayerTruco(
+                    rotate: 1,
+                    vez: vez == 2,
+                    player: player2,
+                    visible: false,
+                  )
+                ), 
+                Positioned(
+                  right: 10,
+                  child: PlayerTruco(
+                    rotate: 3,
+                    vez: vez == 4,
+                    player: player4,
+                    visible: false,
+                  )
+                ), 
+                Positioned(
+                  bottom: 10,
+                  child: PlayerTruco(
+                    vez: vez == 1,
+                    player: player1,
+                    visible: maoOnze,
+                    onTapCard: _onClickCard,
+                    onTapTruco: _onClickTruco,
+                  )
+                ),
+                ...jogadas.map((jogada) {
+                  return TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0, end: 250),
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                    builder: (context, value, child) {
+                      return Positioned(
+                        bottom: jogada.player == 1 ? value : null,
+                        left: jogada.player == 2 ? value : null,
+                        top: jogada.player == 3 ? value : null,
+                        right: jogada.player == 4 ? value : null,
+                        child: CardGame(
+                          mark: jogada.uui == winner?.uui,
+                          card: jogada,
+                          width: 100,
+                        ),
+                      );
+                    },
+                  );
+                }).toList()
+              ],
             ),
           ),
           Container(
-            width: 300,
+            width: size.width * 0.3,
             color: Colors.green[800],
-            padding: EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(10.0),
             child: Column(
               children: [
                 CardGame(
-                  width: 100,
                   card: vira, 
                   visible: visible,
+                  margin: EdgeInsets.only(top: 10, bottom: 20),
                 ),
-                Expanded(                  
+                Divider(color: Colors.white),
+                Expanded(
                   child: ListView(
-                    padding: EdgeInsets.fromLTRB(10, 20, 10, 20),
+                    padding: EdgeInsets.all(10),
                     children: [
-                      Divider(color: Colors.white),
-                      Text("Placar", style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      )),
-                      const SizedBox(height: 7.0),
                       Card(
                         color: player1.color,
                         child: ListTile(
                           title: Text("${player1.name} / ${player3.name}", 
-                            style: TextStyle(color: Colors.white)
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold
+                            )
                           ),
                           trailing: Text("$eqp1", style: TextStyle(
                             color: Colors.white,
@@ -342,29 +336,26 @@ class _GameTrucoState extends State<GameTruco> {
                           title: Text("${player2.name} / ${player4.name}", 
                             style: TextStyle(
                               color: Colors.white,
+                              fontWeight: FontWeight.bold
                             )
                           ),
                           trailing: Text("$eqp2", style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold
                           )),
                         ),
                       ),
+                      const SizedBox(height: 10),
                       Divider(color: Colors.white),
-                      Text("Partida", style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      )),
-                      const SizedBox(height: 7.0),
+                      const SizedBox(height: 10),
                       ListTile(
-                        title: Text("Mão Valendo", 
+                        title: Text("Valendo", 
                           style: TextStyle(
                             color: Colors.white,
                           )
                         ),
-                        trailing: Text("$vale", style: TextStyle(
+                        trailing: Text("$vale Ponto${vale > 1 ? "s": ""}", style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
                           fontWeight: FontWeight.bold
@@ -379,7 +370,6 @@ class _GameTrucoState extends State<GameTruco> {
                           child: _buildBulletsVictory()
                         ),
                       ),
-                      Divider(color: Colors.white),
                     ],
                   ),
                 ),
@@ -388,13 +378,12 @@ class _GameTrucoState extends State<GameTruco> {
                     color: Colors.white
                   )),
                   style: ElevatedButton.styleFrom(
-                    fixedSize: Size(280, 50),
+                    fixedSize: Size(size.width * 0.3, 50),
                     primary: Colors.red,
                   ),
                   onPressed: (){
                     Navigator.of(context).pop();
                   }, 
-                  
                 ),
               ],
             ),
@@ -420,7 +409,7 @@ class _GameTrucoState extends State<GameTruco> {
           color = player2.color;
         }
         
-        return Icon(icon, color: color, size: 18);
+        return Icon(icon, color: color, size: 20);
       }),
     );
   }

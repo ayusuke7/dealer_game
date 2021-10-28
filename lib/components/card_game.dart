@@ -18,7 +18,7 @@ class CardGame extends StatelessWidget {
     Key? key,
     this.card,
     this.onTap,
-    this.width = 150,
+    this.width = 120,
     this.mark = false,
     this.visible = true,
     this.disabled = false,
@@ -28,9 +28,7 @@ class CardGame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    var height = width + 50.0;
-    var size = (height / 10) + 5;
-    var emptySize = size + 15;
+    var heigth = width + (width / 2);
     var flip = (card?.flip ?? card == null) || !visible;
 
     return GestureDetector(
@@ -38,7 +36,7 @@ class CardGame extends StatelessWidget {
       child: AnimatedSwitcher(
         child: Opacity(
           opacity: disabled ? 0.5 : 1.0,
-          child: flip ? _cardFliped(emptySize) : _cardNormal(size)
+          child: flip ? _cardFliped(heigth) : _cardNormal(heigth)
         ),
         duration: Duration(milliseconds: 600),
         transitionBuilder: (widget, animation){
@@ -61,7 +59,8 @@ class CardGame extends StatelessWidget {
     );
   }
 
-  Widget _cardNormal(double size){
+  Widget _cardNormal(double heigth){
+    var size = (heigth / 10) + 5;
     var widget = Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -84,14 +83,11 @@ class CardGame extends StatelessWidget {
       elevation: 5.0,
       margin: margin,
       child: Container(
-        constraints: BoxConstraints(
-          maxWidth: width,
-          maxHeight: width + 50,
-        ),
+        width: width,
+        height: heigth,
         decoration: BoxDecoration(
           color: mark ? Colors.yellow[100] : Colors.white,
           borderRadius: BorderRadius.circular(8)
-          //border: Border.all(width: 2.5, color: card!.color),
         ),
         child: Stack(
           children: [
@@ -114,16 +110,15 @@ class CardGame extends StatelessWidget {
     );
   }
 
-  Widget _cardFliped(double size) {
+  Widget _cardFliped(double heigth) {
+    var size = (heigth / 10) + 20;
     return Card(
       key: ValueKey(123),
       elevation: 5.0,
       margin: margin,
       child: Container(
-        constraints: BoxConstraints(
-          maxWidth: width,
-          maxHeight: width + 50,
-        ),
+        width: width,
+        height: heigth,
         decoration: BoxDecoration(
           color: Colors.blueGrey[400],
           border: Border.all(width: 2.5, color: Colors.white),
@@ -145,7 +140,6 @@ class CardGame extends StatelessWidget {
                   width: size, 
                   height: size
                 ),
-
               ],
             ),
             Row(

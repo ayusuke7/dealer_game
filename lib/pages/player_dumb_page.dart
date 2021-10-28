@@ -212,11 +212,16 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
   Widget _buildCreatePlayer(Size size){
      return Container(
       padding: EdgeInsets.all(20),
+      height: size.height,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
+          Container(
+            width: size.width * 0.6,
+            padding: EdgeInsets.all(5.0),
             child: SingleChildScrollView(
               child: Wrap(
+                alignment: WrapAlignment.center,
                 children: _assets.map((img) => GestureDetector(
                   onTap: (){
                     setState(() => _avatar = img);
@@ -233,51 +238,53 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
             ),
           ),
           Container(
-            width: size.width / 3,
-            padding: EdgeInsets.all(7.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text("Player", style: TextStyle(
-                  fontFamily: "Gameria",
-                  letterSpacing: 5.0,
-                  color: Colors.white,
-                  fontSize: 28,
-                )),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: _name,
-                  decoration: InputDecoration(
-                    fillColor: Colors.white,
-                    focusColor: Colors.white,
-                    filled: true,
-                    hintText: "Nome do Jogador"
+            width: size.width * 0.3,
+            padding: EdgeInsets.all(5.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("Player", style: TextStyle(
+                    fontFamily: "Gameria",
+                    letterSpacing: 5.0,
+                    color: Colors.white,
+                    fontSize: 28,
+                  )),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _name,
+                    decoration: InputDecoration(
+                      fillColor: Colors.white,
+                      focusColor: Colors.white,
+                      filled: true,
+                      hintText: "Nome do Jogador"
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: _host,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    fillColor: Colors.white,
-                    focusColor: Colors.white,
-                    filled: true,
-                    hintText: "IP do Servidor"
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _host,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      fillColor: Colors.white,
+                      focusColor: Colors.white,
+                      filled: true,
+                      hintText: "IP do Servidor"
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: _conectServer, 
-                  icon: Icon(Icons.bolt),
-                  label: Text("Conectar"),
-                  style: ElevatedButton.styleFrom(
-                    fixedSize: Size(size.width / 3, 50),
-                    primary: Colors.blue,
-                    textStyle: TextStyle(fontSize: 16),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: _conectServer, 
+                    icon: Icon(Icons.bolt),
+                    label: Text("Conectar"),
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: Size(size.width / 3, 50),
+                      primary: Colors.blue,
+                      textStyle: TextStyle(fontSize: 16),
+                    )
                   )
-                )
-              ],
+                ],
+              ),
             ),
           ),
         ],

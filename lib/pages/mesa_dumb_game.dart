@@ -276,6 +276,7 @@ class _DumbGameState extends State<DumbGame> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    var widthOpt = size.width * 0.3;
     var notEmptys = mesa.running 
       ? players.where((e) => e.cards.isNotEmpty) 
       : players;
@@ -285,8 +286,7 @@ class _DumbGameState extends State<DumbGame> {
       body: SafeArea(
         child: Row(
           children: [
-            Container(
-              width: size.width - 250,
+            Expanded(
               child: Stack(
                 fit: StackFit.expand,
                 alignment: AlignmentDirectional.center,
@@ -357,15 +357,14 @@ class _DumbGameState extends State<DumbGame> {
               ),
             ),
             Container(
-              width: 250,
+              width: widthOpt,
               color: Colors.green[800],
               padding: EdgeInsets.all(10.0),
               child: Column(
                 children: [
                   CardGame(
-                    width: 100,
                     disabled: deck.isEmpty,
-                    margin: EdgeInsets.only(top: 10, bottom: 30),
+                    margin: EdgeInsets.only(top: 10, bottom: 20),
                   ),
                   
                   Divider(color: Colors.white),
@@ -409,36 +408,41 @@ class _DumbGameState extends State<DumbGame> {
                     ),
                   ),
                   
-                  if(players.length > 1) ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.blue,
-                      fixedSize: Size(200, 40),
-                      textStyle: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16
+                  Visibility(
+                    visible: players.length > 1,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.blue,
+                        fixedSize: Size(widthOpt, 50),
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16
+                        ),
                       ),
+                      child: Text(mesa.running 
+                        ? "Reiniciar Partida" 
+                        : "Iniciar Partida"
+                      ),
+                      onPressed: _distribuitionDeck, 
                     ),
-                    child: Text(mesa.running 
-                      ? "Reiniciar Partida" 
-                      : "Iniciar Partida"
-                    ),
-                    onPressed: _distribuitionDeck, 
                   ),
 
-                  if(!mesa.running) ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      fixedSize: Size(200, 40),
-                      textStyle: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18
+                  Visibility(
+                    visible: !mesa.running,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.red,
+                        fixedSize: Size(widthOpt, 50),
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18
+                        ),
                       ),
+                      child: Text("Sair"),
+                      onPressed: (){
+                        Navigator.pop(context);
+                      }, 
                     ),
-                    child: Text("Sair"),
-                    onPressed: (){
-                      _showInputIpServer();
-                      //Navigator.pop(context);
-                    }, 
                   ),
                 ],
               ),
