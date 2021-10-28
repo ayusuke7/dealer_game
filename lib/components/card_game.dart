@@ -6,37 +6,41 @@ import 'package:flutter_truco/models/card.dart';
 class CardGame extends StatelessWidget {
 
   final CardModel? card;
-  final double width;
   final bool mark;
   final bool visible;
   final bool disabled;
-  final EdgeInsets? margin;
+  final bool selected;
 
+  final Size? size;
+  final EdgeInsets? margin;
   final Function()? onTap;
 
   const CardGame({ 
     Key? key,
     this.card,
     this.onTap,
-    this.width = 120,
     this.mark = false,
     this.visible = true,
     this.disabled = false,
-    this.margin
+    this.selected = false,
+    this.margin,
+    this.size
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     
-    var heigth = width + (width / 2);
+    var width = selected ? 120.0 : 100.0;
+    var height = selected ? 180.0 : 160.0;
     var flip = (card?.flip ?? card == null) || !visible;
+    var cize = size ?? Size(width, height);
 
     return GestureDetector(
       onTap: onTap,
       child: AnimatedSwitcher(
         child: Opacity(
           opacity: disabled ? 0.5 : 1.0,
-          child: flip ? _cardFliped(heigth) : _cardNormal(heigth)
+          child: flip ? _cardFliped(cize) : _cardNormal(cize)
         ),
         duration: Duration(milliseconds: 600),
         transitionBuilder: (widget, animation){
@@ -59,21 +63,20 @@ class CardGame extends StatelessWidget {
     );
   }
 
-  Widget _cardNormal(double heigth){
-    var size = (heigth / 10) + 5;
+  Widget _cardNormal(Size size){
     var widget = Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text("${card?.label}", style: TextStyle(
-          fontSize: size,
+          fontSize: 20.0,
           fontWeight: FontWeight.bold,
           color: card?.color
         )),
         Image.asset(
           "assets/images/${card?.asset}", 
-          width: size, 
-          height: size
+          width: 20.0, 
+          height: 20.0
         )
       ],
     );
@@ -83,8 +86,8 @@ class CardGame extends StatelessWidget {
       elevation: 5.0,
       margin: margin,
       child: Container(
-        width: width,
-        height: heigth,
+        width: selected ? 120 : 100,
+        height: selected ? 180 : 160,
         decoration: BoxDecoration(
           color: mark ? Colors.yellow[100] : Colors.white,
           borderRadius: BorderRadius.circular(8)
@@ -110,15 +113,14 @@ class CardGame extends StatelessWidget {
     );
   }
 
-  Widget _cardFliped(double heigth) {
-    var size = (heigth / 10) + 20;
+  Widget _cardFliped(Size size) {
     return Card(
       key: ValueKey(123),
       elevation: 5.0,
       margin: margin,
       child: Container(
-        width: width,
-        height: heigth,
+        width: selected ? 120 : 100,
+        height: selected ? 180 : 160,
         decoration: BoxDecoration(
           color: Colors.blueGrey[400],
           border: Border.all(width: 2.5, color: Colors.white),
@@ -132,13 +134,13 @@ class CardGame extends StatelessWidget {
               children: [
                 Image.asset(
                   "assets/images/club.png", 
-                  width: size, 
-                  height: size
+                  width: 40.0, 
+                  height: 30.0
                 ),
                 Image.asset(
                   "assets/images/heart.png", 
-                  width: size, 
-                  height: size
+                  width: 30.0, 
+                  height: 30.0
                 ),
               ],
             ),
@@ -147,13 +149,13 @@ class CardGame extends StatelessWidget {
               children: [
                 Image.asset(
                   "assets/images/spades.png", 
-                  width: size, 
-                  height: size
+                  width: 30.0, 
+                  height: 30.0
                 ),
                 Image.asset(
                   "assets/images/diamond.png", 
-                  width: size, 
-                  height: size
+                  width: 30.0, 
+                  height: 30.0
                 )
               ],
             )

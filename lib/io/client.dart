@@ -8,7 +8,7 @@ import 'package:flutter_truco/io/message.dart';
 class Client {
   
   Function(Message) onData;
-  Function(String) onError;
+  Function(dynamic) onError;
   
   bool connected = false;
   
@@ -32,14 +32,15 @@ class Client {
           var message = Message.fromJson(data);
           this.onData(message);
         },
-        onError: this.onError,
         onDone: disconnect,
+        onError: this.onError,
         cancelOnError: false,
       );
       connected = true;
     } on Exception catch (exception) {
       print(exception);
-      this.onError("Error ao se conectar ao Servidor!");
+      connected = false;
+      this.onError(exception);
     }
   }
 

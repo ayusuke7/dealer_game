@@ -104,7 +104,7 @@ class _PlayerTrucoState extends State<PlayerTruco> {
                 return CardGame(
                   card: card,
                   visible: widget.visible,
-                  width: widget.vez && _select?.uui == card.uui ? 120 : 100,
+                  selected: widget.vez && _select?.uui == card.uui,
                   onTap: () {
                     setState(() => _select = card);
                   },

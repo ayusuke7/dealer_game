@@ -62,7 +62,6 @@ class PlayerDumb extends StatelessWidget {
               children: (player?.cards ?? []).map((card) {
                 return CardGame(
                   card: card,
-                  width: width,
                   onTap: () {
                     onTapCard(card);
                   },
@@ -72,7 +71,6 @@ class PlayerDumb extends StatelessWidget {
           ),
           
           if(isDeck) CardGame(
-            width: width, 
             onTap: onTapDeck
           )
         ],

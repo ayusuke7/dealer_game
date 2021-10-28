@@ -249,7 +249,7 @@ class _DumbGameState extends State<DumbGame> {
                 onPressed: (){
                   if(edit.text.isNotEmpty){
                     Navigator.of(ctx).pop();
-                    _createServer(edit.text);
+                    _createServer(edit.text.trim());
                   }
                 }, 
               )
@@ -270,6 +270,7 @@ class _DumbGameState extends State<DumbGame> {
     if(server != null){
       server?.stop();
     }
+    edit.dispose();
     super.dispose();
   }
 
@@ -317,10 +318,7 @@ class _DumbGameState extends State<DumbGame> {
                       builder: (context, value, child) => Positioned(
                         bottom: value,
                         left: (index+1) * 120,
-                        child: CardGame(
-                          card: jogada, 
-                          width: 100
-                        ),
+                        child: CardGame(card: jogada),
                       ));
                   }).toList(),             
                   
@@ -357,7 +355,7 @@ class _DumbGameState extends State<DumbGame> {
               ),
             ),
             Container(
-              width: widthOpt,
+              width: 280,
               color: Colors.green[800],
               padding: EdgeInsets.all(10.0),
               child: Column(

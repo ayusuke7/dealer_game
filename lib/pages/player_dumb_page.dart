@@ -71,12 +71,12 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
     ){
       
       _client = Client(
-        host: _host.text, 
         port: 4444,
+        host: _host.text.trim(), 
         onData: _onDataReceive, 
         onError: (error) {
           Fluttertoast.showToast(
-            msg: error,
+            msg: "Op's ocorreu um erro!",
             toastLength: Toast.LENGTH_LONG,
             gravity: ToastGravity.CENTER
           );
@@ -113,7 +113,7 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
   }
   
   void _disconectServer() async {
-    if(_client != null){
+    if(_client != null && _client!.connected){
       var message = Message(
         type: "disconect", 
         data: _player?.toJson() ?? {}
@@ -295,6 +295,9 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
   Widget _buildCardsPlayer(Size size){
     var cards = _player?.cards ?? [];
     var vez = _mesa.vez == _player?.number;
+    
+    var tapMonte = vez && _mesa.running && _mesa.deck > 0;
+    var tapMesa = !vez && _mesa.running && _mesa.deck == 0;
 
     if(_running && cards.isEmpty){
       return _buildMessage("!! Parabéns !!\nVocê não é BURRO !");
@@ -351,7 +354,6 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
             children: cards.map((card) => CardGame(
               disabled: !vez,
               card: card,
-              width: 120,
               onTap: () { 
                 if(vez) _onTapCard(card);
                },
@@ -365,7 +367,7 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton.icon(
-                onPressed: _mesa.deck > 0 && vez ? _onTapDeck : null, 
+                onPressed: tapMonte  ? _onTapDeck : null, 
                 icon: Icon(Icons.auto_awesome_motion),
                 label: Text("Pegar do Monte"),
                 style: TextButton.styleFrom(
@@ -378,7 +380,7 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
                 ),
               ),
               TextButton.icon(
-                onPressed: _mesa.deck == 0 && !vez ? _onTapTable : null, 
+                onPressed: tapMesa ? _onTapTable : null, 
                 icon: Icon(Icons.download),
                 label: Text("Pegar da Mesa"),
                 style: TextButton.styleFrom(
