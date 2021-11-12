@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_truco/pages/mesa_dumb_game.dart';
-import 'package:flutter_truco/pages/mesa_truco_page.dart';
-import 'package:flutter_truco/pages/player_dumb_page.dart';
+import 'package:flutter_truco/components/create_game.dart';
+import 'package:flutter_truco/pages/truco/mesa_truco_page.dart';
+import 'package:flutter_truco/pages/burro/mesa_dumb_game.dart';
+import 'package:flutter_truco/pages/burro/player_dumb_page.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({ Key? key }) : super(key: key);
@@ -11,17 +12,31 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
-
+  
   void _nextToDumbMesa(){
     Navigator.of(context).push(MaterialPageRoute(
-      builder: (ctx) => DumbGame()
+      builder: (ctx) => MesaDumbGame()
     ));
   }
   
   void _nextToDumbPlay(){
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (ctx) => PlayerDumbPage()
-    ));
+    showDialog(
+      context: context, 
+      builder: (context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          backgroundColor: Colors.transparent,
+          content: CreatePlayer(
+            onConectServer: (model){
+              Navigator.of(context).pop();
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (ctx) => PlayerDumbPage(model: model)
+              ));
+            },
+          ),
+        );
+      }
+    );
   }
   
   void _nextToTrucoMesa(){
@@ -31,9 +46,23 @@ class _MenuPageState extends State<MenuPage> {
   }
   
   void _nextToTrucoPlay(){
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (ctx) => GameTruco()
-    ));
+    showDialog(
+      context: context, 
+      builder: (context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          backgroundColor: Colors.transparent,
+          content: CreatePlayer(
+            onConectServer: (model){
+              Navigator.of(context).pop();
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (ctx) => GameTruco()
+              ));
+            },
+          ),
+        );
+      }
+    );
   }
   
   @override
@@ -44,11 +73,11 @@ class _MenuPageState extends State<MenuPage> {
       fontSize: 26,
     );
 
-
     return Scaffold(
+      backgroundColor: Colors.green[600],
+      extendBodyBehindAppBar: true,
       body: Container(
         width: double.maxFinite,
-        color: Colors.green[600],
         padding: EdgeInsets.all(30),
         child: FittedBox(
           child: Column(

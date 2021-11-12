@@ -1,4 +1,5 @@
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -27,32 +28,34 @@ class Client {
   Future<void> connect() async {
     try {
       socket = await Socket.connect(host, port);
-      socket?.listen((Uint8List uint8){
-          var data = json.decode(String.fromCharCodes(uint8));
-          var message = Message.fromJson(data);
-          this.onData(message);
-        },
+      socket?.listen(_listenData,
         onDone: disconnect,
-        onError: this.onError,
+        onError: onError,
         cancelOnError: false,
       );
       connected = true;
-    } on Exception catch (exception) {
-      print(exception);
+    } catch (exception) {
       connected = false;
-      this.onError(exception);
+      onError(exception);
     }
   }
 
+  void _listenData(Uint8List uint8){
+    var data = json.decode(String.fromCharCodes(uint8));
+    var message = Message.fromJson(data);
+    this.onData(message);
+  }
+
+  void sendMessage(Message message) {
+    var encode = json.encode(message.toJson());
+    socket?.write(encode);
+  }
+  
   Future<void> disconnect() async {
     if (socket != null) {
       await socket?.close();
       socket?.destroy();
       connected = false;
     }
-  }
-
-  void sendMessage(Message message) {
-    socket?.write(json.encode(message.toJson()));
   }
 }

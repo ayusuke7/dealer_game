@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_truco/models/card.dart';
 import 'package:flutter_truco/models/player.dart';
 import 'card_game.dart';
-
 class PlayerTruco extends StatefulWidget {
 
   final Player player;
@@ -105,18 +104,16 @@ class _PlayerTrucoState extends State<PlayerTruco> {
               constraints: BoxConstraints(
                 maxHeight: showOpt ? 140.0 : 120.0
               ),
-              child: FittedBox(
+              child: widget.player.cards.isEmpty ? null : FittedBox(
                 child: Row(
-                  children: widget.player.cards.map((card) {
-                    return CardGame(
-                      card: card,
-                      visible: widget.visible,
-                      selected: widget.vez && _select?.uui == card.uui,
-                      onTap: () {
-                        setState(() => _select = card);
-                      },
-                    );
-                  }).toList()
+                  children: widget.player.cards.map((card) => CardGame(
+                    card: card,
+                    visible: widget.visible,
+                    selected: widget.vez && _select?.uui == card.uui,
+                    onTap: () {
+                      setState(() => _select = card);
+                    },
+                  )).toList()
                 ),
               ),
             ),

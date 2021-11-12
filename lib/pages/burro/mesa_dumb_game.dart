@@ -9,13 +9,13 @@ import 'package:flutter_truco/utils/dealer.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 
-class DumbGame extends StatefulWidget {
-  const DumbGame({ Key? key }) : super(key: key);
+class MesaDumbGame extends StatefulWidget {
+  const MesaDumbGame({ Key? key }) : super(key: key);
   @override
-  _DumbGameState createState() => _DumbGameState();
+  _MesaDumbGameState createState() => _MesaDumbGameState();
 }
 
-class _DumbGameState extends State<DumbGame> {
+class _MesaDumbGameState extends State<MesaDumbGame> {
   final network = NetworkInfo();
   TextEditingController edit = TextEditingController();
 
@@ -98,6 +98,7 @@ class _DumbGameState extends State<DumbGame> {
   }
 
   void _createServer([String? ip]) async {
+    
     var ipServer = ip ?? await network.getWifiIP();
 
     if(ipServer != null){
@@ -262,7 +263,7 @@ class _DumbGameState extends State<DumbGame> {
   @override
   void initState() {
     super.initState();
-     _createServer();
+    _createServer();
   }
 
   @override
