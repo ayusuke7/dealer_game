@@ -8,7 +8,7 @@ class Dealer {
 
     var naipe = 0;
 
-    for(var i=0; i<40; i++){
+    for(var i=0; i<10; i++){
       var value = i % 10;
       var number = value + 1;
 

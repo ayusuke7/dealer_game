@@ -34,6 +34,8 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
     
     if(delay) await Future.delayed(Duration(seconds: 2));
 
+    mesa.jogadas = jogadas.length;
+
     server?.broadcast(Message(
       type: "mesa", 
       data: mesa.toJson()
@@ -181,16 +183,19 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
         if(jogadas.isNotEmpty){
           var play = Player.fromJson(message.data);
           var i = players.indexWhere((p) => p.number == play.number);
+          var tmp = List.of(jogadas);
           if(i > -1){
             setState(() {
-              players[i].addCards(jogadas);
+              players[i].addCards(tmp);
               jogadas.clear();
               mesa.naipe = null;
+              mesa.vez = play.number;
             });
             server?.sendIndex(i, Message(
               type: "table", 
-              data: listCardToJson(players[i].cards)
+              data: listCardToJson(tmp)
             ));
+            _sendBroadcastMesa();
           }
         }
         break;
@@ -441,6 +446,7 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                       onPressed: _distribuitionDeck, 
                     ),
                   ),
+                  const SizedBox(height: 10),
                   Visibility(
                     visible: !mesa.running,
                     child: ElevatedButton(
