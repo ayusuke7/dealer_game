@@ -12,6 +12,7 @@ class CardGame extends StatelessWidget {
   final bool selected;
 
   final double width;
+  final double fontSize;
   final EdgeInsets? margin;
   final Function()? onTap;
 
@@ -21,6 +22,7 @@ class CardGame extends StatelessWidget {
     this.onTap,
     this.margin,
     this.width = 100.0,
+    this.fontSize = 20.0,
     this.mark = false,
     this.visible = true,
     this.disabled = false,
@@ -70,14 +72,14 @@ class CardGame extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text("${card?.label}", style: TextStyle(
-          fontSize: 20.0,
+          fontSize: fontSize,
           fontWeight: FontWeight.bold,
           color: card?.color
         )),
         Image.asset(
           "assets/images/${card?.asset}", 
-          width: 20.0, 
-          height: 20.0
+          width: fontSize, 
+          height: fontSize
         )
       ],
     );

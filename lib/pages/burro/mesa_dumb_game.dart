@@ -331,18 +331,7 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                     ),
                   ),
 
-                  ...jogadas.map((jogada) {
-                    var index = jogadas.indexOf(jogada);
-                    return TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: 50, end: size.height / 2),
-                      duration: Duration(milliseconds: 500),
-                      curve: Curves.easeInOut,
-                      builder: (context, value, child) => Positioned(
-                        bottom: value,
-                        left: (index+1) * 120,
-                        child: CardGame(card: jogada),
-                      ));
-                  }).toList(),             
+                  ..._buildListJogadas(size),             
                   
                   Positioned(
                     bottom: 0,
@@ -353,21 +342,19 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                         spacing: 10.0,
                         runSpacing: 10.0,
                         alignment: WrapAlignment.center,
-                        children: notEmptys.map((p) => GestureDetector(
-                          child: Column(
-                            children: [
-                              Text("${p.name} (${p.cards.length})", style: TextStyle(
-                                color: Colors.white
-                              )),
-                              CircleAvatar(
-                                maxRadius: 40,
-                                backgroundColor: p.number == mesa.vez ? Colors.yellow : null,
-                                child: Image.asset("${p.asset}", 
-                                  fit: BoxFit.contain
-                                ),
+                        children: notEmptys.map((p) => Column(
+                          children: [
+                            Text("${p.name} (${p.cards.length})", style: TextStyle(
+                              color: Colors.white
+                            )),
+                            CircleAvatar(
+                              maxRadius: 40,
+                              backgroundColor: p.number == mesa.vez ? Colors.yellow : null,
+                              child: Image.asset("${p.asset}", 
+                                fit: BoxFit.contain
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         )).toList(),
                       ),
                     )
@@ -471,6 +458,21 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
         ),
       ),
     );
+  }
+
+  List<Widget> _buildListJogadas(Size size){
+    return jogadas.map((jogada) {
+      var index = jogadas.indexOf(jogada);
+      return TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 50, end: size.height / 2),
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+        builder: (context, value, child) => Positioned(
+          bottom: value,
+          left: (index+1) * 120,
+          child: CardGame(card: jogada),
+        ));
+    }).toList();
   }
 
 }

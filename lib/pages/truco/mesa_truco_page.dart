@@ -2,9 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_truco/components/card_game.dart';
 import 'package:flutter_truco/components/player_truco.dart';
+import 'package:flutter_truco/io/message.dart';
+import 'package:flutter_truco/io/server.dart';
 import 'package:flutter_truco/models/card.dart';
+import 'package:flutter_truco/models/mesa.dart';
 import 'package:flutter_truco/models/player.dart';
 import 'package:flutter_truco/utils/dealer.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:network_info_plus/network_info_plus.dart';
 
 class GameTruco extends StatefulWidget {
 
@@ -15,18 +20,33 @@ class GameTruco extends StatefulWidget {
 }
 
 class _GameTrucoState extends State<GameTruco> {
-  
-  Player player1 = new Player(name: "Player 1", number: 1);
-  Player player2 = new Player(name: "Player 2", number: 2, auto: true);
-  Player player3 = new Player(name: "Player 3", number: 3, auto: true);
-  Player player4 = new Player(name: "Player 4", number: 4, auto: true);
+  final network = NetworkInfo();
+  TextEditingController edit = TextEditingController();
 
+  MesaModel mesa = MesaModel();
+  
+  List<Player> players = [];
   List<CardModel> jogadas = [];
   List<int> victorys = [], rounds = [];
+
+  Server? server;
+  String? host;
 
   CardModel? vira, winner;
   int vez = 1, mao = 1, eqp1 = 0, eqp2 = 0, vale = 1;
   bool visible = false;
+
+  void _sendBroadcastMesa([bool delay = false]) async {
+    
+    if(delay) await Future.delayed(Duration(seconds: 2));
+
+    mesa.jogadas = jogadas.length;
+
+    server?.broadcast(Message(
+      type: "mesa", 
+      data: mesa.toJson()
+    ));
+  }
 
   void _checkVictory() async {
     if(jogadas.length == 4){
@@ -73,11 +93,27 @@ class _GameTrucoState extends State<GameTruco> {
   }
 
   void _distribuition() async {
-    var cards = Dealer.dealerDeck(13);
+    var tmpDeck = Dealer.dealerDeck(13);
+    
     var tmpVira = CardModel(
-      value: cards.last.value, 
-      naipe: cards.last.naipe,
+      value: tmpDeck.last.value, 
+      naipe: tmpDeck.last.naipe,
     );
+
+    for(var i=0; i<players.length; i++){
+
+      var pos = i*3;
+      var cards = tmpDeck.getRange(pos, pos + 3).toList();
+      
+      setState(() { players[i].setCards(cards); });
+
+      if(!players[i].auto){
+        server?.sendIndex(i, Message(
+          type: "cards", 
+          data: listCardToJson(players[i].cards)
+        ));
+      }
+    }
 
     setState(() {
       
@@ -86,11 +122,6 @@ class _GameTrucoState extends State<GameTruco> {
       vira = tmpVira;
       jogadas.clear();
       victorys.clear();
-
-      player1.setCards(cards.getRange(0, 3).toList(), tmpVira);
-      player2.setCards(cards.getRange(3, 6).toList(), tmpVira);
-      player3.setCards(cards.getRange(6, 9).toList(), tmpVira);
-      player4.setCards(cards.getRange(9, 12).toList(), tmpVira);
 
       if(eqp1 >= 12 || eqp2 >= 12){
         eqp1 = 0;
@@ -114,16 +145,16 @@ class _GameTrucoState extends State<GameTruco> {
         jogadas.add(card);
 
         if(card.player == 1){
-          player1.removeCard(card);
+          players[0].removeCard(card);
         }else 
         if(card.player == 2){
-          player2.removeCard(card);
+          players[1].removeCard(card);
         }else 
         if(card.player == 3){
-          player3.removeCard(card);
+          players[2].removeCard(card);
         }else 
         if(card.player == 4){
-          player4.removeCard(card);
+          players[3].removeCard(card);
         }
       });
 
@@ -205,25 +236,146 @@ class _GameTrucoState extends State<GameTruco> {
 
   void _randomCardPlay(){
 
-    if(vez == 1 && player1.auto){
-      _onClickCard(player1.randomCard());
+    if(vez == 1 && players[0].auto){
+      _onClickCard(players[0].randomCard());
     }else 
-    if(vez == 2 && player2.auto){
-      _onClickCard(player2.randomCard());
+    if(vez == 2 && players[1].auto){
+      _onClickCard(players[1].randomCard());
     }else 
-    if(vez == 3 && player2.auto){
-      _onClickCard(player3.randomCard());
+    if(vez == 3 && players[2].auto){
+      _onClickCard(players[2].randomCard());
     }else 
-    if(vez == 4 && player4.auto){
-      _onClickCard(player4.randomCard());
+    if(vez == 4 && players[3].auto){
+      _onClickCard(players[3].randomCard());
+    }
+  }
+
+  void _createServer([String? ip]) async {
+    
+    var ipServer = ip ?? await network.getWifiIP();
+
+    if(ipServer != null){
+      server = Server(
+        host: ipServer,
+        port: 4545,
+        onData: _onDataReceive,
+        onError: (error){
+          Fluttertoast.showToast(
+            msg: error,
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.CENTER
+          );
+        }
+      );
+      await server?.start();
+      setState(() {
+        host = server?.server?.address.host;
+      });
+    }else{
+      _showInputIpServer();
+    }
+  }
+
+  void _showInputIpServer(){
+    showDialog(
+      barrierDismissible: false,
+      context: context, 
+      builder: (ctx){
+        return SimpleDialog(
+          contentPadding: EdgeInsets.all(20),
+          children: [
+            Text("Não foi possivel configurar o IP do Servidor!\nPor favor, Informe manualmente!",
+              style: TextStyle(fontSize: 18, height: 1.4),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 20),
+              child: TextFormField(
+                controller: edit,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  fillColor: Colors.white,
+                  focusColor: Colors.white,
+                  filled: true,
+                  hintText: "Ex: 192.169.1.2",
+                  border: OutlineInputBorder()
+                ),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Colors.blue,
+                fixedSize: Size(200, 60),
+                textStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18
+                ),
+              ),
+              child: Text("Iniciar Servidor"),
+              onPressed: (){
+                if(edit.text.isNotEmpty){
+                  Navigator.of(ctx).pop();
+                  _createServer(edit.text.trim());
+                }
+              }, 
+            )
+          ],
+        );
+      }
+    );
+  }
+
+  void _onDataReceive(Message message){
+    print(message.toJson());
+
+    switch (message.type) {
+      case "connect":
+        var player = Player.fromJson(message.data);
+        setState(() {
+          players.addAll([
+            player,
+            new Player(name: "BOT 2", number: 2, auto: true),
+            new Player(name: "BOT 3", number: 3, auto: true),
+            new Player(name: "BOT 4", number: 4, auto: true),
+          ]);
+
+        });
+        break;
+      case "disconect":
+        var player = Player.fromJson(message.data);
+        setState(() {
+          players.removeWhere((p) => p.number == player.number);
+        });
+        break;
+      case "card":
+        var card = CardModel.fromJson(message.data);
+        var i = players.indexWhere((p) => p.number == card.player);
+        if(i > -1){
+          setState(() {
+            jogadas.add(card);
+            players[i].removeCard(card);
+          });
+        }
+        break;
+      default:
+        break;
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _distribuition();
+    _createServer();
   }
+
+   @override
+  void dispose() {
+    if(server != null){
+      server?.stop();
+    }
+    edit.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -240,42 +392,7 @@ class _GameTrucoState extends State<GameTruco> {
                 fit: StackFit.expand,
                 alignment: AlignmentDirectional.center,
                 children: [
-                  Positioned(
-                    top: 10,
-                    child: PlayerTruco(
-                      vez: vez == 3,
-                      player: player3,
-                      visible: false,
-                    )
-                  ),
-                  Positioned(
-                    left: 10,
-                    child: PlayerTruco(
-                      rotate: 1,
-                      vez: vez == 2,
-                      player: player2,
-                      visible: false,
-                    )
-                  ), 
-                  Positioned(
-                    right: 10,
-                    child: PlayerTruco(
-                      rotate: 3,
-                      vez: vez == 4,
-                      player: player4,
-                      visible: false,
-                    )
-                  ), 
-                  Positioned(
-                    bottom: 10,
-                    child: PlayerTruco(
-                      vez: vez == 1,
-                      player: player1,
-                      visible: maoOnze,
-                      onTapCard: _onClickCard,
-                      onTapTruco: _onClickTruco,
-                    )
-                  ),
+                  ..._buildListPlayers(),
                   ..._buildListJogadas()
                 ],
               ),
@@ -295,14 +412,14 @@ class _GameTrucoState extends State<GameTruco> {
                     margin: EdgeInsets.only(top: 10, bottom: 20),
                   ),
                   Divider(color: Colors.white),
-                  ListTile(
-                    title: Text("${player1.name}", 
+                  if(mesa.running) ListTile(
+                    title: Text("${players[0].name}", 
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14
                       )
                     ),
-                    subtitle: Text("${player3.name}", 
+                    subtitle: Text("${players[2].name}", 
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14
@@ -314,14 +431,14 @@ class _GameTrucoState extends State<GameTruco> {
                       fontWeight: FontWeight.bold
                     )),
                   ),
-                  ListTile(
-                    title: Text("${player2.name}", 
+                  if(mesa.running) ListTile(
+                    title: Text("${players[1].name}", 
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14
                       )
                     ),
-                    subtitle: Text("${player4.name}", 
+                    subtitle: Text("${players[3].name}", 
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14
@@ -342,11 +459,13 @@ class _GameTrucoState extends State<GameTruco> {
                         color: Colors.white,
                       )
                     ),
-                    trailing: Text("$vale Ponto${vale > 1 ? "s": ""}", style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold
-                    )),
+                    trailing: Text("$vale Ponto${vale > 1 ? "s": ""}", 
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold
+                      )
+                    ),
                   ),
                   ListTile(
                     title: Text("Rodadas", 
@@ -358,6 +477,17 @@ class _GameTrucoState extends State<GameTruco> {
                     ),
                   ),
                   const SizedBox(height: 30),
+                  ElevatedButton(
+                    child: Text("Iniciar Partida", style: TextStyle(
+                      color: Colors.white
+                    )),
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: Size(size.width * 0.3, 50),
+                      primary: Colors.blue[600],
+                    ),
+                    onPressed: _distribuition, 
+                  ),
+                  const SizedBox(height: 10),
                   ElevatedButton(
                     child: Text("SAIR DO JOGO", style: TextStyle(
                       color: Colors.white
@@ -388,11 +518,11 @@ class _GameTrucoState extends State<GameTruco> {
 
         if(victorys.length > i && victorys[i] == 1){
           icon = Icons.circle;
-          color = player1.color;
+          color = players[0].color;
         }else 
         if(victorys.length > i && victorys[i] == 2){
           icon = Icons.circle;
-          color = player2.color;
+          color = players[1].color;
         }
         
         return Icon(icon, color: color, size: 20);
@@ -400,32 +530,61 @@ class _GameTrucoState extends State<GameTruco> {
     );
   }
 
-  List<Widget> _buildListJogadas(){
-    return jogadas.map((jogada) => TweenAnimationBuilder<double>(
-      curve: Curves.easeInOut,
-      duration: Duration(milliseconds: 500),
-      tween: Tween<double>(begin: 0, end: 250),
-      builder: (context, value, child) {
-        var rotate = 0;
-
-        if(jogada.player == 2) rotate = 1;
-        if(jogada.player == 4) rotate = 3;
-
-        return Positioned(
-          bottom: jogada.player == 1 ? value : null,
-          left: jogada.player == 2 ? value : null,
-          top: jogada.player == 3 ? value : null,
-          right: jogada.player == 4 ? value : null,
-          child: RotatedBox(
-            quarterTurns: rotate,
-            child: CardGame(
-              card: jogada,
-              mark: jogada.uui == winner?.uui,
+  List<Widget> _buildListPlayers(){
+    return players.map((player) {
+      var index = players.indexOf(player);
+      return Positioned(
+        bottom: index == 0 ? 10 : null,
+        left: index == 1 ? 10 : null,
+        top: index == 2 ? 10 : null,
+        right: index == 3 ? 10 : null,
+        child: Column(
+          children: [
+            Text("${player.name} (${player.cards.length})", 
+              style: TextStyle(
+                color: Colors.white
+              )
             ),
-          ),
-        );
-      },
-    )).toList();
+            CircleAvatar(
+              maxRadius: 40,
+              child: Image.asset("${player.getAsset}", 
+                fit: BoxFit.contain
+              ),
+            ),
+          ],
+        )
+      );
+      }).toList();
+  }
+
+  List<Widget> _buildListJogadas(){
+    return jogadas.map((jogada){
+      return TweenAnimationBuilder<double>(
+        curve: Curves.easeInOut,
+        duration: Duration(milliseconds: 500),
+        tween: Tween<double>(begin: 0, end: 250),
+        builder: (context, value, child) {
+          var rotate = 0;
+
+          if(jogada.player == 2) rotate = 1;
+          if(jogada.player == 4) rotate = 3;
+
+          return Positioned(
+            bottom: jogada.player == 1 ? value : null,
+            left: jogada.player == 2 ? value : null,
+            top: jogada.player == 3 ? value : null,
+            right: jogada.player == 4 ? value : null,
+            child: RotatedBox(
+              quarterTurns: rotate,
+              child: CardGame(
+                card: jogada,
+                mark: jogada.uui == winner?.uui,
+              ),
+            ),
+          );
+        },
+      );
+    }).toList();
   }
 
 }

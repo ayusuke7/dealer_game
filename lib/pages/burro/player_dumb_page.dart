@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_truco/components/card_game.dart';
+import 'package:flutter_truco/components/message_screen.dart';
 import 'package:flutter_truco/io/client.dart';
 import 'package:flutter_truco/io/message.dart';
 import 'package:flutter_truco/models/card.dart';
@@ -12,7 +13,10 @@ class PlayerDumbPage extends StatefulWidget {
 
   final CreatePlayerModel model;
 
-  const PlayerDumbPage({ Key? key,  required this.model }) : super(key: key);
+  const PlayerDumbPage({ 
+    Key? key,  
+    required this.model 
+  }) : super(key: key);
 
   @override
   _PlayerDumbPageState createState() => _PlayerDumbPageState();
@@ -166,10 +170,18 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
     var component;
 
     if(_running && cards.isEmpty){
-      component = _buildMessage("!! Parabéns !!\nVocê não é BURRO !");
+      component = MessageScreen(
+        avatar: _player?.asset,
+        title: "!! Parabéns !!",
+        message: "Você não é BURRO !"
+      );
     }else 
     if(_running && _mesa.burro == _player?.number){
-      component = _buildMessage("!! Parabéns !!\nVocê conseguiu ser \no mais BURRO da sua turma.");
+      component = MessageScreen(
+        avatar: _player?.asset,
+        title: "!! Parabéns !!",
+        message: "Você conseguiu ser \no mais BURRO da sua turma."
+      );
     }else{
       component = Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -281,35 +293,10 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.green[600],
       extendBodyBehindAppBar: true,
+      backgroundColor: Colors.green[600],
       body: SafeArea(child: component)
     );
   }
- 
-  Widget _buildMessage(String message){
-    return Container(
-      width: double.maxFinite,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircleAvatar(
-            radius: 50,
-            child: Image.asset("${_player?.asset}", 
-              fit: BoxFit.contain
-            ),
-          ),
-          Text(message, 
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 36,
-              color: Colors.white,
-              fontWeight: FontWeight.bold
-            )
-          )
-        ],
-      ),
-    );
-  }
+
 }

@@ -7,9 +7,10 @@ class Player {
   final String name;
   final int number;
   final bool auto;
-  final String? asset;
 
   List<CardModel> _cards = [];
+  
+  String? asset;
 
   Player({  
     required this.name,
@@ -71,6 +72,15 @@ class Player {
 
   void clearCards(){
     this._cards.clear();
+  }
+
+  String get getAsset {
+    if(asset == null){
+      var rd = Random.secure().nextInt(11) + 1;
+      asset = "assets/images/avatar$rd.png";
+    }
+
+    return "$asset";
   }
 
   CardModel randomCard({ List<CardModel>? jogadas }){

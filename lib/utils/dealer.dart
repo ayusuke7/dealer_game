@@ -2,13 +2,13 @@ import 'package:flutter_truco/models/card.dart';
 
 class Dealer {
 
-  static List<CardModel> surfleDeck(){
+  static List<CardModel> surfleDeck([int length = 40]){
 
     List<CardModel> tmpDeck = [];
 
     var naipe = 0;
 
-    for(var i=0; i<10; i++){
+    for(var i=0; i<length; i++){
       var value = i % 10;
       var number = value + 1;
 

@@ -7,6 +7,7 @@ class Server {
   final Function(Message) onData;
   final Function(String) onError;
   final String host;
+  final int port;
 
   ServerSocket? server;
   bool running = false;
@@ -15,12 +16,13 @@ class Server {
   Server({
     required this.onData,
     required this.onError,
-    required this.host
+    required this.host,
+    this.port = 4444
   });
 
   Future<void> start() async {
     try {
-      server = await ServerSocket.bind(host, 4444);      
+      server = await ServerSocket.bind(host, port);      
       server?.listen((Socket socket){
         socket.listen((Uint8List uint8){
           var data = String.fromCharCodes(uint8);
@@ -39,7 +41,7 @@ class Server {
         });
       });
       this.running = true;
-      print('Server listening on $host:4444');
+      print('Server listening on $host:$port');
 
     } catch (ex) {
       print(ex);

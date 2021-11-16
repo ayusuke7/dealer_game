@@ -18,8 +18,8 @@ class CreatePlayer extends StatefulWidget {
 
 class _CreatePlayerState extends State<CreatePlayer> {
   
-  TextEditingController _name = TextEditingController();
-  TextEditingController _host = TextEditingController();
+  TextEditingController _name = TextEditingController(text: "Teste");
+  TextEditingController _host = TextEditingController(text: "192.168.1.9");
   
   List<String> _assets = [];
   String? _avatar;
