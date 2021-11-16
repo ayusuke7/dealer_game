@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Truco',
+      title: 'Dealer Game',
       theme: ThemeData(
         primarySwatch: Colors.green,
         elevatedButtonTheme: ElevatedButtonThemeData(

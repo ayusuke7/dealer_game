@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_truco/commons/strings.dart';
 import 'package:flutter_truco/components/card_game.dart';
 import 'package:flutter_truco/io/message.dart';
 import 'package:flutter_truco/io/server.dart';
@@ -215,49 +216,64 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
   void _showInputIpServer(){
     showDialog(
       barrierDismissible: false,
-        context: context, 
-        builder: (ctx){
-          return SimpleDialog(
-            contentPadding: EdgeInsets.all(20),
-            children: [
-              Text("Não foi possivel configurar o IP do Servidor!\nPor favor, Informe manualmente!",
-                style: TextStyle(fontSize: 18, height: 1.4),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 20),
-                child: TextFormField(
-                  controller: edit,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    fillColor: Colors.white,
-                    focusColor: Colors.white,
-                    filled: true,
-                    hintText: "Ex: 192.169.1.2",
-                    border: OutlineInputBorder()
-                  ),
+      context: context, 
+      builder: (ctx){
+        return SimpleDialog(
+          contentPadding: EdgeInsets.all(20),
+          children: [
+            Text("Não foi possivel configurar o IP do Servidor!\nPor favor, Informe manualmente!",
+              style: TextStyle(fontSize: 18, height: 1.4),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 20),
+              child: TextFormField(
+                controller: edit,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  fillColor: Colors.white,
+                  focusColor: Colors.white,
+                  filled: true,
+                  hintText: "Ex: 192.169.1.2",
+                  border: OutlineInputBorder()
                 ),
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.blue,
-                  fixedSize: Size(200, 60),
-                  textStyle: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18
-                  ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Colors.blue,
+                fixedSize: Size(200, 60),
+                textStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18
                 ),
-                child: Text("Iniciar Servidor"),
-                onPressed: (){
-                  if(edit.text.isNotEmpty){
-                    Navigator.of(ctx).pop();
-                    _createServer(edit.text.trim());
-                  }
-                }, 
-              )
-            ],
-          );
-        }
-      );
+              ),
+              child: Text("Iniciar Servidor"),
+              onPressed: (){
+                if(edit.text.isNotEmpty){
+                  Navigator.of(ctx).pop();
+                  _createServer(edit.text.trim());
+                }
+              }, 
+            )
+          ],
+        );
+      }
+    );
+  }
+
+  void _showDialogRegras(){
+    showDialog(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        contentPadding: EdgeInsets.all(20.0),
+        title: Text("Regras", textAlign: TextAlign.center),
+        children: BURRO_RULES.map((text) {
+          return Text(text, style: TextStyle(
+            fontSize: 16.0
+          ));
+        }).toList(),
+      )
+    );
   }
 
   @override
@@ -297,7 +313,7 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                     top: 100,
                     child: Column(
                       children: [
-                        Text("Aguardando Jogadores",
+                        Text("Aguardando 2+ Jogadores",
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white,fontSize: 16)
                         ),
@@ -364,6 +380,14 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                   CardGame(
                     disabled: deck.isEmpty,
                     margin: EdgeInsets.only(top: 10, bottom: 20),
+                  ),
+                  TextButton.icon(
+                    icon: Icon(Icons.info_outline), 
+                    label: Text("Regras"),
+                    style: TextButton.styleFrom(
+                      primary: Colors.white
+                    ),
+                    onPressed: _showDialogRegras, 
                   ),
                   Divider(color: Colors.white),
                   ListTile(

@@ -197,11 +197,13 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
                       )),
                     ),
                   ),
-                  Text("Cartas: ${_player?.cards.length ?? " "}", style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold
-                  )),
+                  Text("Cartas: ${_player?.cards.length ?? "0"}", 
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold
+                    )
+                  ),
                   const SizedBox(width: 40),
                   Text("Jogada: ",style: TextStyle(
                     fontSize: 20,
@@ -209,8 +211,9 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
                     fontWeight: FontWeight.bold
                   )),
                   _mesa.asset != null
-                    ? Image.asset("assets/images/${_mesa.asset}", width: 30)
-                    : Icon(Icons.help_outline, color: Colors.white, size: 30)
+                    ? Image.asset("assets/images/${_mesa.asset}", width: 25)
+                    : Icon(Icons.help_outline, color: Colors.white, size: 25),
+                  const SizedBox(width: 10),
                 ],
               ),
             ),

@@ -84,15 +84,16 @@ class _MenuPageState extends State<MenuPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Flutter ", style: TextStyle(
+                  Text("Dealer ", style: TextStyle(
                     fontFamily: "Gameria", 
                     fontSize: 60,
                     color: Colors.white
                   )),
-                  Text("Dealer", style: TextStyle(
+                  Text("Game", style: TextStyle(
                     fontFamily: "Gameria", 
                     fontSize: 60,
                     color: Colors.yellow
@@ -116,78 +117,78 @@ class _MenuPageState extends State<MenuPage> {
                   ),*/
                 ],
               ),
-              Container(
-                margin: EdgeInsets.only(
-                  top: 40, 
-                  bottom: 20
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset("assets/images/burro.png",
-                      width: 150,
-                      height: 150,
-                    ),
-                    const SizedBox(width: 20),
-                    Column(
-                      children: [
-                        ElevatedButton(
-                          autofocus: true,
-                          onPressed: _nextToDumbMesa, 
-                          child: Text("BURRO MESA", style: textStyle),
-                          style: ElevatedButton.styleFrom(
-                            fixedSize: Size(230, 70),
-                            primary: Colors.red
-                          ),
+              const SizedBox(height: 15),
+              Text("Selecione o Jogo", style: TextStyle(
+                fontFamily: "Gameria", 
+                fontSize: 22,
+                color: Colors.white
+              )),
+              const SizedBox(height: 40),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset("assets/images/burro.png",
+                    width: 150,
+                    height: 150,
+                  ),
+                  const SizedBox(width: 20),
+                  Column(
+                    children: [
+                      ElevatedButton(
+                        autofocus: true,
+                        onPressed: _nextToDumbMesa, 
+                        child: Text("BURRO MESA", style: textStyle),
+                        style: ElevatedButton.styleFrom(
+                          fixedSize: Size(230, 70),
+                          primary: Colors.red
                         ),
-                        const SizedBox(height: 7.0),
-                        ElevatedButton(
-                          onPressed: _nextToDumbPlay, 
-                          child: Text("BURRO PLAYER", style: textStyle),
-                          style: ElevatedButton.styleFrom(
-                            fixedSize: Size(230, 70),
-                            primary: Colors.blue
-                          ),
+                      ),
+                      const SizedBox(height: 7.0),
+                      ElevatedButton(
+                        onPressed: _nextToDumbPlay, 
+                        child: Text("BURRO PLAYER", style: textStyle),
+                        style: ElevatedButton.styleFrom(
+                          fixedSize: Size(230, 70),
+                          primary: Colors.blue
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              Container(
-                margin: EdgeInsets.only(top: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset("assets/images/truco.png",
-                      width: 150,
-                      height: 150,
-                    ),
-                    const SizedBox(width: 20),
-                    Column(
-                      children: [
-                        ElevatedButton(
-                          onPressed: _nextToTrucoMesa, 
-                          child: Text("TRUCO MESA", style: textStyle),
-                          style: ElevatedButton.styleFrom(
-                            fixedSize: Size(230, 70),
-                            primary: Colors.red
-                          ),
+              const SizedBox(height: 40),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset("assets/images/truco.png",
+                    width: 150,
+                    height: 150,
+                  ),
+                  const SizedBox(width: 20),
+                  Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: _nextToTrucoMesa, 
+                        child: Text("TRUCO MESA", style: textStyle),
+                        style: ElevatedButton.styleFrom(
+                          fixedSize: Size(230, 70),
+                          primary: Colors.red
                         ),
-                        const SizedBox(height: 7.0),
-                        ElevatedButton(
-                          onPressed: _nextToTrucoPlay, 
-                          child: Text("TRUCO PLAYER", style: textStyle),
-                          style: ElevatedButton.styleFrom(
-                            fixedSize: Size(230, 70),
-                            primary: Colors.blue
-                          ),
+                      ),
+                      const SizedBox(height: 7.0),
+                      ElevatedButton(
+                        onPressed: _nextToTrucoPlay, 
+                        child: Text("TRUCO PLAYER", style: textStyle),
+                        style: ElevatedButton.styleFrom(
+                          fixedSize: Size(230, 70),
+                          primary: Colors.blue
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              )
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         )
