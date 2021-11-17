@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_truco/components/card_game.dart';
-import 'package:flutter_truco/components/player_truco.dart';
 import 'package:flutter_truco/io/message.dart';
 import 'package:flutter_truco/io/server.dart';
 import 'package:flutter_truco/models/card.dart';

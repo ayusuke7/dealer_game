@@ -11,7 +11,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class PlayerDumbPage extends StatefulWidget {
 
-  final CreatePlayerModel model;
+  final CreatePlayerModel? model;
 
   const PlayerDumbPage({ 
     Key? key,  
@@ -65,7 +65,7 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
     
       _client = Client(
         port: 4444,
-        host: widget.model.host, 
+        host: "${widget.model?.host}", 
         onData: _onDataReceive, 
         onError: (error) {
           Fluttertoast.showToast(
@@ -80,8 +80,8 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
         if(_client!.connected){
           var play = Player(
             number: _client.hashCode,
-            asset: widget.model.avatar,
-            name: widget.model.name,
+            asset: widget.model?.avatar,
+            name: "${widget.model?.name}",
           );
           var message = Message(
             type: "connect", 
@@ -196,11 +196,11 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
                     contentPadding: EdgeInsets.zero,
                     leading: CircleAvatar(
                       radius: 30,
-                      child: Image.asset("${widget.model.avatar}", 
+                      child: Image.asset("${widget.model?.avatar}", 
                         fit: BoxFit.contain
                       ),
                     ),
-                    title: Text("${widget.model.name}",style: TextStyle(
+                    title: Text("${widget.model?.name}",style: TextStyle(
                       fontSize: 20,
                       color: Colors.white,
                       fontWeight: FontWeight.bold

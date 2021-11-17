@@ -4,6 +4,7 @@ class MesaModel {
   int? vez;
   int? naipe;
   int? burro;
+  int? vencedor;
 
   int deck;
   int jogadas;
@@ -15,7 +16,8 @@ class MesaModel {
     this.running = false,
     this.naipe,
     this.vez,
-    this.burro
+    this.burro,
+    this.vencedor
   });
 
   String? get asset {
@@ -43,6 +45,7 @@ class MesaModel {
     burro: json["burro"],
     running: json["running"],
     jogadas: json["jogadas"],
+    vencedor: json["vencedor"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -52,5 +55,6 @@ class MesaModel {
     "burro": burro,
     "running": running,
     "jogadas": jogadas,
+    "vencedor": vencedor,
   };
 }

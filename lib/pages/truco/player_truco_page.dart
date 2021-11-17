@@ -6,12 +6,11 @@ import 'package:flutter_truco/models/card.dart';
 import 'package:flutter_truco/models/create_player.dart';
 import 'package:flutter_truco/models/mesa.dart';
 import 'package:flutter_truco/models/player.dart';
-import 'package:flutter_truco/utils/dealer.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class PlayerTrucoGame extends StatefulWidget {
   
-  final CreatePlayerModel model;
+  final CreatePlayerModel? model;
 
   const PlayerTrucoGame({ 
     Key? key, 
@@ -64,14 +63,12 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
     });
 
   }
-  
-  void _onTapTrucar(){}
 
   void _conectServer() async {
     
       client = Client(
         port: 4545,
-        host: widget.model.host, 
+        host: "${widget.model?.host}", 
         onData: _onDataReceive, 
         onError: (error) {
           Fluttertoast.showToast(
@@ -86,8 +83,8 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
         if(client!.connected){
           var play = Player(
             number: client.hashCode,
-            asset: widget.model.avatar,
-            name: widget.model.name,
+            asset: "${widget.model?.avatar}",
+            name: "${widget.model?.name}",
           );
           var message = Message(
             type: "connect", 

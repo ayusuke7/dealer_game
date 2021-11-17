@@ -6,10 +6,12 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   
   SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeLeft
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight
   ]).then((_){
     runApp(MyApp());
   });
+  
 }
 
 class MyApp extends StatelessWidget {
@@ -23,17 +25,17 @@ class MyApp extends StatelessWidget {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             overlayColor: MaterialStateProperty.all<Color>(
-              Colors.black.withOpacity(0.095)
+              Colors.black.withOpacity(0.085)
             ),
             shape: MaterialStateProperty.resolveWith<OutlinedBorder>((states) {
               if(states.contains(MaterialState.focused)){
                 return RoundedRectangleBorder(
-                  side: BorderSide(color: Colors.yellow, width: 4.5),
+                  side: BorderSide(color: Colors.yellow, width: 3.5),
                   borderRadius: BorderRadius.circular(10),
                 );
               }
               return RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10)
+                borderRadius: BorderRadius.circular(5)
               );
             })
           )

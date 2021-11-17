@@ -27,6 +27,8 @@ dependencies:
   network_info_plus: ^2.0.2
   fluttertoast: ^8.0.8
   animated_text_kit: ^4.2.1
+  shared_preferences: ^2.0.8
+  flutter_switch: ^0.3.2
 
 dev_dependencies:
   flutter_test:

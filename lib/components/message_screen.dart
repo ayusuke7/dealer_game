@@ -27,7 +27,7 @@ class MessageScreen extends StatelessWidget {
               fit: BoxFit.contain
             ),
           ),
-          if(title != null) Text(message, 
+          if(title != null) Text("$title", 
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 38,

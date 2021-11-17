@@ -5,11 +5,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class CreatePlayer extends StatefulWidget {
 
-  final Function(CreatePlayerModel model) onConectServer;
+  final CreatePlayerModel? model;
+  final Function(CreatePlayerModel model) onTapSave;
 
   const CreatePlayer({ 
     Key? key,
-    required this.onConectServer
+    this.model,
+    required this.onTapSave,
   }) : super(key: key);
 
   @override
@@ -18,8 +20,8 @@ class CreatePlayer extends StatefulWidget {
 
 class _CreatePlayerState extends State<CreatePlayer> {
   
-  TextEditingController _name = TextEditingController(text: "Teste");
-  TextEditingController _host = TextEditingController(text: "192.168.1.9");
+  TextEditingController _name = TextEditingController();
+  TextEditingController _host = TextEditingController();
   
   List<String> _assets = [];
   String? _avatar;
@@ -34,9 +36,11 @@ class _CreatePlayerState extends State<CreatePlayer> {
     }).toList();
 
     if(images.isNotEmpty){
+      var tmp = widget.model?.avatar;
+
       setState(() {
         _assets = images;
-        _avatar = images.first;
+        _avatar = tmp ?? images.first;
       });
     }
 
@@ -48,11 +52,14 @@ class _CreatePlayerState extends State<CreatePlayer> {
         _host.text.trim().isNotEmpty && 
         _name.text.trim().isNotEmpty
       ){
-          widget.onConectServer(CreatePlayerModel(
+          
+          var model = CreatePlayerModel(
             avatar: _avatar,
             host: _host.text.trim(),
             name: _name.text.trim()
-          ));
+          );
+          
+          widget.onTapSave(model);        
       } else {
         Fluttertoast.showToast(
           msg: "Preencha os campos!",
@@ -69,6 +76,11 @@ class _CreatePlayerState extends State<CreatePlayer> {
   void initState() {
     super.initState();
     _listAssets();
+
+    if(widget.model != null){
+      _name.text = widget.model!.name;
+      _host.text = widget.model!.host;
+    }
   }
 
   @override
@@ -80,28 +92,32 @@ class _CreatePlayerState extends State<CreatePlayer> {
 
   @override
   Widget build(BuildContext context) {
+    print(_avatar);
     var size = MediaQuery.of(context).size;
     return SingleChildScrollView(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            width: size.width * 0.5,
+            width: size.width * 0.4,
             padding: EdgeInsets.all(5.0),
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              children: _assets.map((img) => GestureDetector(
-                onTap: (){
-                  setState(() => _avatar = img);
-                },
-                child: CircleAvatar(
-                  child: Image.asset(img),
-                  radius: 40,
-                  backgroundColor: _avatar == img 
-                    ? Colors.yellow 
-                    : Colors.transparent,
-                ),
-              )).toList(),
+            child: SingleChildScrollView(
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                children: _assets.map((img) => GestureDetector(
+                  onTap: (){
+                    setState(() => _avatar = img);
+                  },
+                  child: CircleAvatar(
+                    child: Image.asset(img),
+                    radius: 40,
+                    backgroundColor: _avatar == img 
+                      ? Colors.yellow 
+                      : Colors.transparent,
+                  ),
+                )).toList(),
+              ),
             ),
           ),
           Container(
@@ -111,13 +127,6 @@ class _CreatePlayerState extends State<CreatePlayer> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text("Player", style: TextStyle(
-                  fontFamily: "Gameria",
-                  letterSpacing: 5.0,
-                  color: Colors.white,
-                  fontSize: 28,
-                )),
-                const SizedBox(height: 20),
                 TextFormField(
                   controller: _name,
                   decoration: InputDecoration(
@@ -141,8 +150,8 @@ class _CreatePlayerState extends State<CreatePlayer> {
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   onPressed: _onConnect,
-                  icon: Icon(Icons.bolt),
-                  label: Text("Conectar"),
+                  icon: Icon(Icons.save),
+                  label: Text("Salvar"),
                   style: ElevatedButton.styleFrom(
                     fixedSize: Size(size.width / 3, 50),
                     primary: Colors.blue,

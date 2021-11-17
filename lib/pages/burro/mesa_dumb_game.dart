@@ -28,8 +28,8 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
   Server? server;
   String? host;
 
-  Player? burro, winner;
-
+  int ini = 0;
+  
   void _sendBroadcastMesa([bool delay = false]) async {
     
     if(delay) await Future.delayed(Duration(seconds: 2));
@@ -67,7 +67,7 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
         mesa.naipe = null;
         mesa.running = true;
         mesa.deck = deck.length;
-        mesa.vez = players[0].number;
+        mesa.vez = players[ini].number;
       });
 
       _sendBroadcastMesa(true);
@@ -75,11 +75,12 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
 
   void _checkWinRound(){
 
-    var emptys = players.where((p) => p.cards.isNotEmpty).toList();
-    if(emptys.length == 1){
+    var notEmptys = players.where((p) => p.cards.isNotEmpty).toList();
+
+    if(notEmptys.length == 1){
       setState(() {
-        mesa.burro = emptys.first.number;
-        burro = emptys.first;
+        mesa.burro = notEmptys.first.number;
+        ini = ini == players.length - 1 ? 0 : ini + 1;
       });
     }else
     if(jogadas.length == players.length){
@@ -90,8 +91,8 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
         jogadas.clear();
       });
     }else{
-      var i = emptys.indexWhere((p) => p.number == mesa.vez);
-      var next = i < emptys.length - 1 ? emptys[i+1] : emptys.first;
+      var i = notEmptys.indexWhere((p) => p.number == mesa.vez);
+      var next = i < notEmptys.length - 1 ? notEmptys[i+1] : notEmptys.first;
       setState(() { 
         mesa.vez = next.number; 
       });
@@ -300,6 +301,7 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     var widthOpt = size.width * 0.3;
+    
     var notEmptys = mesa.running 
       ? players.where((e) => e.cards.isNotEmpty) 
       : players;
@@ -316,18 +318,9 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                 children: [
                   if(!mesa.running) Positioned(
                     top: 100,
-                    child: Column(
-                      children: [
-                        Text("Aguardando 2+ Jogadores",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white,fontSize: 16)
-                        ),
-                        const SizedBox(height: 10),
-                        Text(host != null ? "Servidor $host" : "",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white,fontSize: 16)
-                        ),
-                      ],
+                    child: Text("Aguardando 2+ Jogadores",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white,fontSize: 16)
                     ),
                   ),
 
@@ -348,7 +341,7 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                               color: Colors.white
                             )),
                             CircleAvatar(
-                              maxRadius: 40,
+                              maxRadius: 35,
                               backgroundColor: p.number == mesa.vez ? Colors.yellow : null,
                               child: Image.asset("${p.asset}", 
                                 fit: BoxFit.contain
@@ -364,92 +357,108 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
               ),
             ),
             Container(
-              width: 280,
+              width: size.width * 0.20,
               color: Colors.green[800],
               padding: EdgeInsets.all(10.0),
-              child: ListView(
+              child: Column(
                 children: [
-                  CardGame(
-                    disabled: deck.isEmpty,
-                    margin: EdgeInsets.only(top: 10, bottom: 20),
-                  ),
-                  TextButton.icon(
-                    icon: Icon(Icons.info_outline), 
-                    label: Text("Regras"),
-                    style: TextButton.styleFrom(
-                      primary: Colors.white
-                    ),
-                    onPressed: _showDialogRegras, 
-                  ),
-                  Divider(color: Colors.white),
-                  ListTile(
-                    title: Text("Servidor", 
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold
-                      )
-                    ),
-                    subtitle: server != null 
-                      ? Text("$host", style: TextStyle(
-                        color: Colors.white,
-                      )) : null,
-                    trailing: Icon(
-                      Icons.circle, 
-                      size: 20,
-                      color: mesa.running ? Colors.blue : Colors.yellow,
-                    ),
-                  ),
-                  ListTile(
-                    title: Text("Baralho", 
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold
-                      )
-                    ),
-                    trailing: Text("${deck.length}", style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold
-                    )),
-                  ),
-                  const SizedBox(height: 30),
-                  Visibility(
-                    visible: players.length > 1,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.blue,
-                        fixedSize: Size(widthOpt, 50),
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        TextButton.icon(
+                          icon: Icon(Icons.info_outline), 
+                          label: Text("Regras"),
+                          style: TextButton.styleFrom(
+                            primary: Colors.white
+                          ),
+                          onPressed: _showDialogRegras, 
                         ),
-                      ),
-                      child: Text(mesa.running 
-                        ? "Reiniciar Partida" 
-                        : "Iniciar Partida"
-                      ),
-                      onPressed: _distribuitionDeck, 
+                        CardGame(
+                          disabled: deck.isEmpty,
+                          margin: EdgeInsets.only(top: 10, bottom: 20),
+                        ),
+                        Divider(color: Colors.white),
+                        ListTile(
+                          title: Text("Servidor", 
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold
+                            )
+                          ),
+                          subtitle: server != null 
+                            ? Text("$host", style: TextStyle(
+                              color: Colors.white,
+                            )) : null,
+                          trailing: Icon(
+                            Icons.circle, 
+                            size: 20,
+                            color: mesa.running ? Colors.blue : Colors.yellow,
+                          ),
+                        ),
+                        ListTile(
+                          title: Text("Baralho", 
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold
+                            )
+                          ),
+                          trailing: Text("${deck.length}", style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold
+                          )),
+                        ),
+                        Divider(color: Colors.white),
+                        /* ...players.map((p) {
+                          return ListTile(
+                            title: Text(p.name, 
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                              )
+                            ),
+                          );
+                        }).toList() */
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Visibility(
-                    visible: !mesa.running,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
-                        fixedSize: Size(widthOpt, 50),
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18
-                        ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.blue,
+                      fixedSize: Size(widthOpt, 40),
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16
                       ),
-                      child: Text("Sair"),
-                      onPressed: (){
+                    ),
+                    child: Text(mesa.running 
+                      ? "Reiniciar Partida" 
+                      : "Iniciar Partida"
+                    ),
+                    onPressed: (){
+                      if(players.length > 1){
+                        _distribuitionDeck();
+                      }
+                    }, 
+                  ),
+                  const SizedBox(height: 5.0),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.red,
+                      fixedSize: Size(widthOpt, 40),
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16
+                      ),
+                    ),
+                    child: Text("Sair"),
+                    onPressed: (){
+                      if(!mesa.running){
                         Navigator.pop(context);
-                      }, 
-                    ),
+                      }
+                    }, 
                   ),
                 ],
               ),
