@@ -301,7 +301,6 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     var widthOpt = size.width * 0.3;
-    
 
     var notEmptys = mesa.running 
       ? players.where((e) => e.cards.isNotEmpty) 
