@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Storage {
 
   static final String configs = 'dl@player';
+  static final String mode = 'dl@mode';
 
   static Future<bool> save(String key, String data) async {
     final prefs = await SharedPreferences.getInstance();
@@ -26,6 +27,15 @@ class Storage {
     return prefs.clear();
   }
 
+  static Future<bool> saveMode(bool value){
+    return save(mode, "$value");
+  }
+  
+  static Future<bool> getMode() async {
+    var data = await gett(mode);
+    return data == "true";
+  }
+  
   static Future<bool> saveModelPlayer(CreatePlayerModel model){
     var data = configToJson(model);
     return save(configs, data);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class MessageScreen extends StatelessWidget {
 
+  final Widget? child;
   final String? avatar;
   final String? title;
   final String message;
@@ -10,6 +11,7 @@ class MessageScreen extends StatelessWidget {
     Key? key,
     this.avatar,
     this.title,
+    this.child,
     required this.message
   }) : super(key: key);
 
@@ -21,6 +23,10 @@ class MessageScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          if(child != null) Container(
+            margin: EdgeInsets.all(10.0),
+            child: child
+          ),
           if(avatar != null) CircleAvatar(
             radius: 50,
             child: Image.asset("$avatar", 
@@ -38,7 +44,7 @@ class MessageScreen extends StatelessWidget {
           Text(message, 
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 34,
+              fontSize: 32,
               color: Colors.white,
               fontWeight: FontWeight.bold
             )

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_truco/components/card_game.dart';
+import 'package:flutter_truco/components/message_screen.dart';
 import 'package:flutter_truco/io/client.dart';
 import 'package:flutter_truco/io/message.dart';
 import 'package:flutter_truco/models/card.dart';
@@ -31,6 +32,7 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
 
   bool vez = false;
   bool running = false;
+  bool loading = false;
 
   void _onTapVirar(){
     setState(() {
@@ -74,11 +76,13 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
           Fluttertoast.showToast(
             msg: "Op's ocorreu um erro!",
             toastLength: Toast.LENGTH_LONG,
-            gravity: ToastGravity.CENTER
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.red
           );
         }
       );
 
+      setState(() => loading = true);
       client?.connect().then((_){
         if(client!.connected){
           var play = Player(
@@ -91,7 +95,10 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
             data: play.toJson()
           );
           client?.sendMessage(message);
-          setState(() { player = play; });
+          setState(() { 
+            player = play;
+            loading = false;
+          });
         }else{
           Navigator.of(context).pop();
         }
@@ -149,117 +156,130 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
   Widget build(BuildContext context) {
     var cards = player?.cards ?? [];
 
+    var component;
+
+    if(loading){
+      component = MessageScreen(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(
+             Colors.yellow
+          ),
+        ),
+        message: "Procurando Servidor, aguarde!",
+      );
+    }else {
+      component = Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            padding: EdgeInsets.all(7.0),
+            color: Colors.green[800],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: CircleAvatar(
+                      radius: 30,
+                      child: Image.asset("${player?.getAsset}", 
+                        fit: BoxFit.contain
+                      ),
+                    ),
+                    title: Text("${player?.name}",style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold
+                    )),
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: (){
+                    Navigator.of(context).pop();
+                  }, 
+                  icon: Icon(Icons.exit_to_app), 
+                  label: Text("Sair"),
+                  style: TextButton.styleFrom(
+                    primary: Colors.white
+                  ),
+                )
+              ],
+            ),
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: cards.map((card) {
+                return CardGame(
+                  card: card,
+                  visible: true,
+                  selected: select?.uui == card.uui,
+                  onTap: () {
+                    setState(() => select = card);
+                  },
+                );
+              }).toList()
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(7.0),
+            color: Colors.green[800],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton.icon(
+                  onPressed: (){}, 
+                  icon: Icon(Icons.bolt),
+                  label: Text("Trucar"),
+                  style: TextButton.styleFrom(
+                    minimumSize: Size(150, 40),
+                    backgroundColor: Colors.red[400],
+                    primary: Colors.white,
+                    textStyle: TextStyle(
+                      fontSize: 16
+                    )
+                  ),
+                ),
+                const SizedBox(width: 15),
+                TextButton.icon(
+                  onPressed: _onTapCard, 
+                  icon: Icon(Icons.arrow_circle_up),
+                  label: Text("Jogar"),
+                  style: TextButton.styleFrom(
+                    minimumSize: Size(150, 40),
+                    backgroundColor: Colors.blue[400],
+                    primary: Colors.white,
+                    textStyle: TextStyle(
+                      fontSize: 16
+                    )
+                  ),
+                ),
+                const SizedBox(width: 15),
+                TextButton.icon(
+                  onPressed: _onTapVirar, 
+                  icon: Icon(Icons.rotate_left),
+                  label: Text("Vira"),
+                  style: TextButton.styleFrom(
+                    minimumSize: Size(150, 40),
+                    backgroundColor: Colors.purple[400],
+                    primary: Colors.white,
+                    textStyle: TextStyle(
+                      fontSize: 16
+                    )
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      );
+    }
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.green[600],
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              padding: EdgeInsets.all(7.0),
-              color: Colors.green[800],
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: CircleAvatar(
-                        radius: 30,
-                        child: Image.asset("${player?.getAsset}", 
-                          fit: BoxFit.contain
-                        ),
-                      ),
-                      title: Text("${player?.name}",style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold
-                      )),
-                    ),
-                  ),
-                  TextButton.icon(
-                    onPressed: (){
-                      Navigator.of(context).pop();
-                    }, 
-                    icon: Icon(Icons.exit_to_app), 
-                    label: Text("Sair"),
-                    style: TextButton.styleFrom(
-                      primary: Colors.white
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: cards.map((card) {
-                  return CardGame(
-                    card: card,
-                    visible: true,
-                    selected: select?.uui == card.uui,
-                    onTap: () {
-                      setState(() => select = card);
-                    },
-                  );
-                }).toList()
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(7.0),
-              color: Colors.green[800],
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton.icon(
-                    onPressed: (){}, 
-                    icon: Icon(Icons.bolt),
-                    label: Text("Trucar"),
-                    style: TextButton.styleFrom(
-                      minimumSize: Size(150, 40),
-                      backgroundColor: Colors.red[400],
-                      primary: Colors.white,
-                      textStyle: TextStyle(
-                        fontSize: 16
-                      )
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  TextButton.icon(
-                    onPressed: _onTapCard, 
-                    icon: Icon(Icons.arrow_circle_up),
-                    label: Text("Jogar"),
-                    style: TextButton.styleFrom(
-                      minimumSize: Size(150, 40),
-                      backgroundColor: Colors.blue[400],
-                      primary: Colors.white,
-                      textStyle: TextStyle(
-                        fontSize: 16
-                      )
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  TextButton.icon(
-                    onPressed: _onTapVirar, 
-                    icon: Icon(Icons.rotate_left),
-                    label: Text("Vira"),
-                    style: TextButton.styleFrom(
-                      minimumSize: Size(150, 40),
-                      backgroundColor: Colors.purple[400],
-                      primary: Colors.white,
-                      textStyle: TextStyle(
-                        fontSize: 16
-                      )
-                    ),
-                  ),
-                ],
-              ),
-            )
-          ],
-        )
-      )
+      body: SafeArea(child: component)
     );
   }
 }

@@ -302,6 +302,7 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
     var size = MediaQuery.of(context).size;
     var widthOpt = size.width * 0.3;
     
+
     var notEmptys = mesa.running 
       ? players.where((e) => e.cards.isNotEmpty) 
       : players;
@@ -312,6 +313,7 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
         child: Row(
           children: [
             Expanded(
+              flex: 3,
               child: Stack(
                 fit: StackFit.expand,
                 alignment: AlignmentDirectional.center,
@@ -356,111 +358,114 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                 ],
               ),
             ),
-            Container(
-              width: size.width * 0.20,
-              color: Colors.green[800],
-              padding: EdgeInsets.all(10.0),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: ListView(
-                      children: [
-                        TextButton.icon(
-                          icon: Icon(Icons.info_outline), 
-                          label: Text("Regras"),
-                          style: TextButton.styleFrom(
-                            primary: Colors.white
+            Expanded(
+              flex: 1,
+              child: Container(
+                color: Colors.green[800],
+                padding: EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          TextButton.icon(
+                            icon: Icon(Icons.info_outline), 
+                            label: Text("Regras"),
+                            style: TextButton.styleFrom(
+                              primary: Colors.white
+                            ),
+                            onPressed: _showDialogRegras, 
                           ),
-                          onPressed: _showDialogRegras, 
-                        ),
-                        CardGame(
-                          disabled: deck.isEmpty,
-                          margin: EdgeInsets.only(top: 10, bottom: 20),
-                        ),
-                        Divider(color: Colors.white),
-                        ListTile(
-                          title: Text("Servidor", 
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold
-                            )
+                          CardGame(
+                            disabled: deck.isEmpty,
+                            margin: EdgeInsets.only(top: 10, bottom: 20),
                           ),
-                          subtitle: server != null 
-                            ? Text("$host", style: TextStyle(
-                              color: Colors.white,
-                            )) : null,
-                          trailing: Icon(
-                            Icons.circle, 
-                            size: 20,
-                            color: mesa.running ? Colors.blue : Colors.yellow,
-                          ),
-                        ),
-                        ListTile(
-                          title: Text("Baralho", 
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold
-                            )
-                          ),
-                          trailing: Text("${deck.length}", style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold
-                          )),
-                        ),
-                        Divider(color: Colors.white),
-                        /* ...players.map((p) {
-                          return ListTile(
-                            title: Text(p.name, 
+                          Divider(color: Colors.white),
+                          ListTile(
+                            title: Text("Servidor", 
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 color: Colors.white,
+                                fontWeight: FontWeight.bold
                               )
                             ),
-                          );
-                        }).toList() */
-                      ],
-                    ),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.blue,
-                      fixedSize: Size(widthOpt, 40),
-                      textStyle: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16
+                            subtitle: server != null 
+                              ? Text("$host", style: TextStyle(
+                                color: Colors.white,
+                              )) : null,
+                            trailing: Icon(
+                              Icons.circle, 
+                              size: 20,
+                              color: mesa.running ? Colors.blue : Colors.yellow,
+                            ),
+                          ),
+                          ListTile(
+                            title: Text("Baralho", 
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold
+                              )
+                            ),
+                            trailing: Text("${deck.length}", style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold
+                            )),
+                          ),
+                          Divider(color: Colors.white),
+                          /* ...players.map((p) {
+                            return ListTile(
+                              title: Text(p.name, 
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                )
+                              ),
+                            );
+                          }).toList() */
+                          const SizedBox(height: 5.0),
+                        ],
                       ),
                     ),
-                    child: Text(mesa.running 
-                      ? "Reiniciar Partida" 
-                      : "Iniciar Partida"
-                    ),
-                    onPressed: (){
-                      if(players.length > 1){
-                        _distribuitionDeck();
-                      }
-                    }, 
-                  ),
-                  const SizedBox(height: 5.0),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      fixedSize: Size(widthOpt, 40),
-                      textStyle: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.blue,
+                        fixedSize: Size(widthOpt, 40),
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16
+                        ),
                       ),
+                      child: Text(mesa.running 
+                        ? "Reiniciar Partida" 
+                        : "Iniciar Partida"
+                      ),
+                      onPressed: (){
+                        if(players.length > 1){
+                          _distribuitionDeck();
+                        }
+                      }, 
                     ),
-                    child: Text("Sair"),
-                    onPressed: (){
-                      if(!mesa.running){
-                        Navigator.pop(context);
-                      }
-                    }, 
-                  ),
-                ],
+                    const SizedBox(height: 5.0),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.red,
+                        fixedSize: Size(widthOpt, 40),
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16
+                        ),
+                      ),
+                      child: Text("Sair da Partida"),
+                      onPressed: (){
+                        if(!mesa.running){
+                          Navigator.pop(context);
+                        }
+                      }, 
+                    ),
+                  ],
+                ),
               ),
             )
           ],

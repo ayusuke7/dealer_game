@@ -30,6 +30,7 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
   Player? _player;
 
   bool _running = false;
+  bool _loading = false;
 
   void _onTapCard(CardModel card){
     if(_mesa.naipe == null || _mesa.naipe == card.naipe) {
@@ -71,10 +72,13 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
           Fluttertoast.showToast(
             msg: "Op's ocorreu um erro!",
             toastLength: Toast.LENGTH_LONG,
-            gravity: ToastGravity.CENTER
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.red
           );
         }
       );
+
+      setState(() => _loading = true);
 
       _client?.connect().then((_){
         if(_client!.connected){
@@ -88,7 +92,10 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
             data: play.toJson()
           );
           _client?.sendMessage(message);
-          setState(() { _player = play; });
+          setState(() { 
+            _player = play; 
+            _loading = false;
+          });
         }else{
           Navigator.of(context).pop();
         }
@@ -169,6 +176,16 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
 
     var component;
 
+    if(_loading){
+      component = MessageScreen(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(
+             Colors.yellow
+          ),
+        ),
+        message: "Procurando Servidor, aguarde!",
+      );
+    }else
     if(_running && cards.isEmpty){
       component = MessageScreen(
         avatar: _player?.asset,

@@ -92,77 +92,82 @@ class _CreatePlayerState extends State<CreatePlayer> {
 
   @override
   Widget build(BuildContext context) {
-    print(_avatar);
     var size = MediaQuery.of(context).size;
-    return SingleChildScrollView(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: size.width * 0.4,
-            padding: EdgeInsets.all(5.0),
-            child: SingleChildScrollView(
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                children: _assets.map((img) => GestureDetector(
-                  onTap: (){
-                    setState(() => _avatar = img);
-                  },
-                  child: CircleAvatar(
-                    child: Image.asset(img),
-                    radius: 40,
-                    backgroundColor: _avatar == img 
-                      ? Colors.yellow 
-                      : Colors.transparent,
-                  ),
-                )).toList(),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: size.width * 0.5,
+          padding: EdgeInsets.all(5.0),
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            children: _assets.map((img) => GestureDetector(
+              onTap: (){
+                setState(() => _avatar = img);
+              },
+              child: CircleAvatar(
+                child: Image.asset(img),
+                radius: 40,
+                backgroundColor: _avatar == img 
+                  ? Colors.yellow 
+                  : Colors.transparent,
               ),
-            ),
+            )).toList(),
           ),
-          Container(
-            width: size.width * 0.3,
-            padding: EdgeInsets.all(5.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                TextFormField(
-                  controller: _name,
-                  decoration: InputDecoration(
-                    fillColor: Colors.white,
-                    focusColor: Colors.white,
-                    filled: true,
-                    hintText: "Nome do Jogador"
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: _host,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    fillColor: Colors.white,
-                    focusColor: Colors.white,
-                    filled: true,
-                    hintText: "IP do Servidor"
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: _onConnect,
-                  icon: Icon(Icons.save),
-                  label: Text("Salvar"),
-                  style: ElevatedButton.styleFrom(
-                    fixedSize: Size(size.width / 3, 50),
-                    primary: Colors.blue,
-                    textStyle: TextStyle(fontSize: 16),
-                  )
+        ),
+        Container(
+          width: size.width * 0.3,
+          padding: EdgeInsets.all(5.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text("Player", 
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: "Gameria",
+                  letterSpacing: 5.0,
+                  color: Colors.white,
+                  fontSize: 28,
                 )
-              ],
-            ),
+              ),
+              const SizedBox(height: 30),
+              TextFormField(
+                controller: _name,
+                decoration: InputDecoration(
+                  fillColor: Colors.white,
+                  focusColor: Colors.white,
+                  filled: true,
+                  hintText: "Nome do Jogador"
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _host,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  fillColor: Colors.white,
+                  focusColor: Colors.white,
+                  filled: true,
+                  hintText: "IP do Servidor"
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: _onConnect,
+                icon: Icon(Icons.save),
+                label: Text("Salvar"),
+                style: ElevatedButton.styleFrom(
+                  fixedSize: Size(size.width / 3, 50),
+                  primary: Colors.blue,
+                  textStyle: TextStyle(fontSize: 16),
+                )
+              )
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

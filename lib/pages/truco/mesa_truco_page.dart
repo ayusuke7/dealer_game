@@ -33,6 +33,7 @@ class _GameTrucoState extends State<GameTruco> {
 
   CardModel? vira, winner;
   int vez = 1, mao = 1, eqp1 = 0, eqp2 = 0, vale = 1;
+  
   bool visible = false;
 
   void _sendBroadcastMesa([bool delay = false]) async {
@@ -403,79 +404,85 @@ class _GameTrucoState extends State<GameTruco> {
               ),
               color: Colors.green[800],
               padding: EdgeInsets.all(10.0),
-              child: ListView(
+              child: Column(
                 children: [
-                  CardGame(
-                    card: vira, 
-                    visible: visible,
-                    margin: EdgeInsets.only(top: 10, bottom: 20),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        CardGame(
+                          card: vira, 
+                          visible: visible,
+                          margin: EdgeInsets.only(top: 10, bottom: 20),
+                        ),
+                        Divider(color: Colors.white),
+                        if(mesa.running) ListTile(
+                          title: Text("${players[0].name}", 
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14
+                            )
+                          ),
+                          subtitle: Text("${players[2].name}", 
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14
+                            )
+                          ),
+                          trailing: Text("$eqp1", style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold
+                          )),
+                        ),
+                        if(mesa.running) ListTile(
+                          title: Text("${players[1].name}", 
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14
+                            )
+                          ),
+                          subtitle: Text("${players[3].name}", 
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14
+                            )
+                          ),
+                          trailing: Text("$eqp2", style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold
+                          )),
+                        ),
+                        const SizedBox(height: 10),
+                        Divider(color: Colors.white),
+                        const SizedBox(height: 10),
+                        ListTile(
+                          title: Text("Valendo", 
+                            style: TextStyle(
+                              color: Colors.white,
+                            )
+                          ),
+                          trailing: Text("$vale Ponto${vale > 1 ? "s": ""}", 
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold
+                            )
+                          ),
+                        ),
+                        ListTile(
+                          title: Text("Rodadas", 
+                            style: TextStyle(color: Colors.white)
+                          ),
+                          trailing: SizedBox(
+                            width: 60,
+                            child: _buildBulletsVictory()
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                      ],
+                    ),
                   ),
-                  Divider(color: Colors.white),
-                  if(mesa.running) ListTile(
-                    title: Text("${players[0].name}", 
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14
-                      )
-                    ),
-                    subtitle: Text("${players[2].name}", 
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14
-                      )
-                    ),
-                    trailing: Text("$eqp1", style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold
-                    )),
-                  ),
-                  if(mesa.running) ListTile(
-                    title: Text("${players[1].name}", 
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14
-                      )
-                    ),
-                    subtitle: Text("${players[3].name}", 
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14
-                      )
-                    ),
-                    trailing: Text("$eqp2", style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold
-                    )),
-                  ),
-                  const SizedBox(height: 10),
-                  Divider(color: Colors.white),
-                  const SizedBox(height: 10),
-                  ListTile(
-                    title: Text("Valendo", 
-                      style: TextStyle(
-                        color: Colors.white,
-                      )
-                    ),
-                    trailing: Text("$vale Ponto${vale > 1 ? "s": ""}", 
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold
-                      )
-                    ),
-                  ),
-                  ListTile(
-                    title: Text("Rodadas", 
-                      style: TextStyle(color: Colors.white)
-                    ),
-                    trailing: SizedBox(
-                      width: 60,
-                      child: _buildBulletsVictory()
-                    ),
-                  ),
-                  const SizedBox(height: 30),
                   ElevatedButton(
                     child: Text("Iniciar Partida", style: TextStyle(
                       color: Colors.white
@@ -488,7 +495,7 @@ class _GameTrucoState extends State<GameTruco> {
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
-                    child: Text("SAIR DO JOGO", style: TextStyle(
+                    child: Text("Sair da Partida", style: TextStyle(
                       color: Colors.white
                     )),
                     style: ElevatedButton.styleFrom(

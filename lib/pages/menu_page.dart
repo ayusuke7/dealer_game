@@ -55,16 +55,9 @@ class _MenuPageState extends State<MenuPage> {
       context: context, 
       builder: (context) {
         return AlertDialog(
-          title: Text("Player", 
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: "Gameria",
-              letterSpacing: 5.0,
-              color: Colors.white,
-              fontSize: 28,
-            )
-          ),
+          scrollable: true,
           backgroundColor: Colors.transparent,
+          contentPadding: EdgeInsets.zero,
           content: CreatePlayer(
             model: player,
             onTapSave: (model){
@@ -78,20 +71,32 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
   
+  void _getModelPlayer(){
+    Storage.getModelPlayer().then((value) {
+        if(value != null){
+          print(value.toJson());
+          setState(() {
+            player = value;
+          });
+        }
+      });
+  }
+
+  void _getStorage() async {
+    var mode = await Storage.getMode();
+    if(mode){
+      _getModelPlayer();
+    }else{
+      setState(() {
+        modePlayer = mode;
+      });
+    }
+  }
+ 
   @override
   void initState() {
     super.initState();
-
-
-    Storage.getModelPlayer().then((value) {      
-      if(value != null){
-        print(value.toJson());
-        setState(() {
-          player = value;
-        });
-      }
-    });
-
+    _getStorage();
   }
   
   @override
@@ -105,7 +110,6 @@ class _MenuPageState extends State<MenuPage> {
     return Scaffold(
       backgroundColor: Colors.green[600],
       appBar: AppBar(
-        toolbarHeight: 100.0,
         backgroundColor: Colors.green[800],
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -125,109 +129,114 @@ class _MenuPageState extends State<MenuPage> {
       ),
       body: Container(
         padding: EdgeInsets.all(30),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text("MESA", style: textStyle.merge(
-                  TextStyle(fontSize: 26)
-                )),
-                Container(
-                  margin: EdgeInsets.only(left: 20, right: 20),
-                  child: FlutterSwitch(
-                    width: 120.0,
-                    height: 50.0,
-                    padding: 8.0,
-                    toggleSize: 45.0,
-                    value: modePlayer,
-                    borderRadius: 30.0,
-                    valueFontSize: 20.0,
-                    activeColor: Colors.blue,
-                    inactiveColor: Colors.red,
-                    activeIcon: Icon(Icons.face),
-                    inactiveIcon: Icon(Icons.how_to_vote),
-                    onToggle: (val) {
-                      setState(() {
-                        modePlayer = val;
-                      });
-                    },
+        width: double.maxFinite,
+        child: FittedBox(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("MESA", style: textStyle.merge(
+                    TextStyle(fontSize: 26)
+                  )),
+                  Container(
+                    margin: EdgeInsets.only(left: 20, right: 20),
+                    child: FlutterSwitch(
+                      width: 120.0,
+                      height: 50.0,
+                      padding: 8.0,
+                      toggleSize: 45.0,
+                      value: modePlayer,
+                      borderRadius: 30.0,
+                      valueFontSize: 20.0,
+                      activeColor: Colors.blue,
+                      inactiveColor: Colors.red,
+                      activeIcon: Icon(Icons.face),
+                      inactiveIcon: Icon(Icons.how_to_vote),
+                      onToggle: (value) {
+                        setState(() { modePlayer = value; });
+                        Storage.saveMode(value);
+                        if(value && player == null){
+                          _getModelPlayer();
+                        }
+                      },
+                    ),
                   ),
-                ),
-                Text("PLAYER", style: textStyle.merge(
-                  TextStyle(fontSize: 26)
-                )),
-              ],
-            ),
-            const SizedBox(height: 50.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  autofocus: true,
-                  onPressed: _onTapBurro, 
-                  child: Column(
-                    children: [
-                      Image.asset("assets/images/burro.png",
-                        width: 150,
-                        height: 150,
-                      ),
-                      const SizedBox(height: 15),
-                      Text("JOGO DO BURRO", style: textStyle),
-                    ],
+                  Text("PLAYER", style: textStyle.merge(
+                    TextStyle(fontSize: 26)
+                  )),
+                ],
+              ),
+              const SizedBox(height: 50.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    autofocus: true,
+                    onPressed: _onTapBurro, 
+                    child: Column(
+                      children: [
+                        Image.asset("assets/images/burro.png",
+                          width: 150,
+                          height: 150,
+                        ),
+                        const SizedBox(height: 15),
+                        Text("JOGO DO BURRO", style: textStyle),
+                      ],
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.transparent,
+                      padding: EdgeInsets.all(15.0),
+                    ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
-                    padding: EdgeInsets.all(15.0)
+                  const SizedBox(width: 20),
+                  ElevatedButton(
+                    onPressed: _onTapTruco, 
+                    child: Column(
+                      children: [
+                        Image.asset("assets/images/truco.png",
+                          width: 150,
+                          height: 150,
+                        ),
+                        const SizedBox(height: 15),
+                        Text("JOGO DO TRUCO", style: textStyle),
+                      ],
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.transparent,
+                      padding: EdgeInsets.all(15.0)
+                    ),
                   ),
-                ),
-                const SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: _onTapTruco, 
-                  child: Column(
-                    children: [
-                      Image.asset("assets/images/truco.png",
-                        width: 150,
-                        height: 150,
-                      ),
-                      const SizedBox(height: 15),
-                      Text("JOGO DO TRUCO", style: textStyle),
-                    ],
+                  const SizedBox(width: 20),
+                  if(modePlayer) ElevatedButton(
+                    onPressed: _createPlayer, 
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        player != null ? Image.asset("${player?.avatar}", 
+                          width: 130, 
+                          height: 130
+                        ) : Icon(Icons.face, size: 100.0),
+                        const SizedBox(height: 10),
+                        Text(player?.name ?? "Player", style: textStyle, softWrap: false,),
+                        Text(player?.host ?? "", style: TextStyle(
+                          fontSize: 18
+                        )),
+                      ],
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.transparent,
+                      padding: EdgeInsets.all(15.0),
+                      fixedSize: Size(170, 220)
+                    ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
-                    padding: EdgeInsets.all(15.0)
-                  ),
-                ),
-                const SizedBox(width: 20),
-                if(modePlayer) ElevatedButton(
-                  onPressed: _createPlayer, 
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      player != null ? Image.asset("${player?.avatar}", 
-                        width: 130, 
-                        height: 130
-                      ) : Icon(Icons.face, size: 100.0),
-                      const SizedBox(height: 10),
-                      Text(player?.name ?? "Player", style: textStyle, softWrap: false,),
-                      Text(player?.host ?? "", style: TextStyle(
-                        fontSize: 18
-                      )),
-                    ],
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
-                    padding: EdgeInsets.all(15.0),
-                    fixedSize: Size(170, 220)
-                  ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         )
       ),
     );
