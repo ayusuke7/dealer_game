@@ -18,19 +18,20 @@ class MesaDumbGame extends StatefulWidget {
 
 class _MesaDumbGameState extends State<MesaDumbGame> {
   
-  final network = NetworkInfo();
   final edit = TextEditingController();
+  final network = NetworkInfo();
 
   MesaModel mesa = MesaModel();
 
-  List<Player> players = [], winners = [];
   List<CardModel> deck = [], jogadas = [];
+  List<Player> players = [];
+  List<String> logs = [];
 
   Server? server;
   String? host;
-
+  
   int ini = 0;
-  List<String> logs = [];
+  bool win = false;
 
   void _createLog(String log){
     print(log);
@@ -76,20 +77,34 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
         mesa.running = true;
         mesa.deck = deck.length;
         mesa.vez = players[ini].number;
+        win = false;
       });
 
       _sendBroadcastMesa(true);
   }
 
-  void _checkWinRound(Player player){
+  void _checkWinPartida(int index){
+    if(!win && players[index].cards.isEmpty){
+      setState(() {
+        players[index].placar.addWinner();
+        win = true;
+      });
+    }
+  }
 
-    var playComCartas = players.where((p) => p.cards.isNotEmpty).toList();
+  void _checkWinRound(){
+    
+    var playComCartas = players.where((p){
+      return p.cards.isNotEmpty;
+    }).toList();
 
     if(playComCartas.length == 1){
       var next = ini == players.length - 1 ? 0 : ini + 1;
+      var burro = playComCartas.first;
       setState(() {
         ini = next;
-        mesa.burro = playComCartas.first.number;
+        mesa.burro = burro.number;
+        burro.placar.addLooser();
       });
     } else {
       var jogComCartas = Dealer.filterJogadas(jogadas, playComCartas);
@@ -100,6 +115,7 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
           mesa.naipe = null;
           jogadas.clear();
         });
+        _createLog("Jogadas: ${listCardToJson(jogComCartas)}");
       }else{
         var i = players.indexWhere((p) => p.number == mesa.vez);
         var nextPlayer = Dealer.nextPlayerComCartas(players, i);
@@ -108,7 +124,7 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
         });
       }
     }
-
+    
     _sendBroadcastMesa();
   }
 
@@ -128,7 +144,9 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
           );
         }
       );
+      
       await server?.start();
+      
       setState(() {
         host = server?.server?.address.host;
       });
@@ -142,18 +160,19 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
 
     switch (message.type) {
       case "connect":
-        var player = Player.fromJson(message.data);
-        setState(() {
-          players.add(player);
-        });
+        if(!mesa.running){
+          var player = Player.fromJson(message.data);
+          setState(() {
+            players.add(player);
+          });
+        }
         break;
       case "disconect":
-        var player = Player.fromJson(message.data);
-        setState(() {
-          players.removeWhere((p) => p.number == player.number);
-        });
-        if(players.length == 1){
-          _restartGame();
+        if(mounted){
+          var player = Player.fromJson(message.data);
+          setState(() {
+            players.removeWhere((p) => p.number == player.number);
+          });
         }
         break;
       case "card":
@@ -165,8 +184,10 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
             mesa.naipe = card.naipe;
             players[i].removeCard(card);
           });
+          _checkWinPartida(i);
+          
           Future.delayed(Duration(milliseconds: 800), (){
-            _checkWinRound(players[i]);
+            _checkWinRound();
           });
         }
         break;
@@ -211,25 +232,14 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
           }
         }
         break;
+      case "restart":
+        _distribuitionDeck();
+        break;
       default:
         break;
     }
   }
-  
-  void _restartGame(){
-    setState(() {
-      mesa = MesaModel();
-      jogadas.clear();
-      deck.clear();
-    });
-
-    server?.broadcast(Message(
-      type: "disconect", 
-      data: null
-    ));
-
-  }
-  
+   
   void _showInputIpServer(){
     showDialog(
       barrierDismissible: false,
@@ -314,6 +324,18 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
     );
   }
 
+  void _exitServer() async {
+    if(server != null){
+      server?.broadcast(Message(
+        type: "disconect", 
+        data: null
+      ));
+      await server?.stop();
+    }
+    
+    Navigator.pop(context);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -322,9 +344,6 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
 
   @override
   void dispose() {
-    if(server != null){
-      server?.stop();
-    }
     edit.dispose();
     super.dispose();
   }
@@ -338,6 +357,12 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
       ? players.where((e) => e.cards.isNotEmpty) 
       : players;
 
+    var style = TextStyle(
+      fontSize: 16,
+      color: Colors.white,
+      fontWeight: FontWeight.bold
+    );
+
     return Scaffold(
       backgroundColor: Colors.green[600],
       body: SafeArea(
@@ -349,15 +374,28 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                 fit: StackFit.expand,
                 alignment: AlignmentDirectional.center,
                 children: [
+
                   if(!mesa.running) Positioned(
-                    top: 100,
-                    child: Text("Aguardando 2+ Jogadores",
+                    top: size.height / 2,
+                    child: Text("Aguardando mais de\n2 Jogadores",
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.white,fontSize: 16)
                     ),
                   ),
 
-                  ..._buildListJogadas(size),             
+                  for (var i = 0; i < jogadas.length; i++)
+                    TweenAnimationBuilder<double>(
+                      tween: Tween<double>(
+                        begin: 50, 
+                        end: size.height / 2
+                      ),
+                      duration: Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                      builder: (context, value, child) => Positioned(
+                        bottom: value,
+                        left: (i+1) * 120,
+                        child: CardGame(card: jogadas[i]),
+                      )),
                   
                   Positioned(
                     bottom: 0,
@@ -371,7 +409,7 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                         children: notEmptys.map((p) => Column(
                           children: [
                             Text("${p.name} (${p.cards.length})", style: TextStyle(
-                              color: Colors.white
+                              color: Colors.white,
                             )),
                             CircleAvatar(
                               maxRadius: 35,
@@ -413,13 +451,7 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                           ),
                           Divider(color: Colors.white),
                           ListTile(
-                            title: Text("Servidor", 
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold
-                              )
-                            ),
+                            title: Text("Servidor", style: style),
                             subtitle: server != null 
                               ? Text("$host", style: TextStyle(
                                 color: Colors.white,
@@ -432,13 +464,7 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                             onTap: _showLogPartida,
                           ),
                           ListTile(
-                            title: Text("Baralho", 
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold
-                              )
-                            ),
+                            title: Text("Baralho", style: style),
                             trailing: Text("${deck.length}", style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -446,61 +472,45 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                             )),
                           ),
                           Divider(color: Colors.white),
-                          /* ...players.map((p) {
-                            return ListTile(
-                              title: Text(p.name, 
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.white,
-                                )
-                              ),
-                            );
-                          }).toList() */
-                          const SizedBox(height: 5.0),
+                          _buildLineRow("Jogad", "Burro", "Vence"),
+                          
+                          for (var player in players) 
+                            _buildLineRow(
+                              player.name, 
+                              "${player.placar.looser}",
+                              "${player.placar.winner}",
+                            ),
                         ],
                       ),
                     ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.blue,
-                        fixedSize: Size(widthOpt, 40),
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16
+                    players.length > 1 
+                    ? ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.blue,
+                          fixedSize: Size(widthOpt, 40),
+                          textStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16
+                          ),
                         ),
-                      ),
-                      child: Text(mesa.running 
-                        ? "Reiniciar Partida" 
-                        : "Iniciar Partida"
-                      ),
-                      onPressed: (){
-                        if(players.length > 1){
-                          _distribuitionDeck();
-                        }
-                      }, 
-                    ),
-                    const SizedBox(height: 5.0),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
-                        fixedSize: Size(widthOpt, 40),
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16
+                        child: Text(mesa.running 
+                          ? "Reiniciar Partida" 
+                          : "Iniciar Partida"
                         ),
+                        onPressed: _distribuitionDeck, 
+                      )
+                    : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red,
+                          fixedSize: Size(widthOpt, 40),
+                          textStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16
+                          ),
+                        ),
+                        child: Text("Sair da Partida"),
+                        onPressed: _exitServer, 
                       ),
-                      child: Text("Sair da Partida"),
-                      onPressed: (){
-                        if(!mesa.running){
-                          Navigator.pop(context);
-                        }else{
-                          Fluttertoast.showToast(
-                            msg: "Necessário que Todos Saiam da Partida",
-                            gravity: ToastGravity.BOTTOM
-                          );
-                        }
-                      }, 
-                    ),
                   ],
                 ),
               ),
@@ -511,19 +521,36 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
     );
   }
 
-  List<Widget> _buildListJogadas(Size size){
-    return jogadas.map((jogada) {
-      var index = jogadas.indexOf(jogada);
-      return TweenAnimationBuilder<double>(
-        tween: Tween<double>(begin: 50, end: size.height / 2),
-        duration: Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-        builder: (context, value, child) => Positioned(
-          bottom: value,
-          left: (index+1) * 120,
-          child: CardGame(card: jogada),
-        ));
-    }).toList();
+  Widget _buildLineRow(String col1, String col2, String col3){
+    var style = TextStyle(
+      fontSize: 16,
+      color: Colors.white,
+      fontWeight: FontWeight.bold
+    );
+    return  Container(
+      margin: const EdgeInsets.only(bottom: 7.0),
+      padding: const EdgeInsets.only(bottom: 7.0),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.white))
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(child: Text("$col1", style: style, 
+            textAlign: TextAlign.center,
+            softWrap: false,
+          )),
+          Expanded(child: Text("$col2", style: style, 
+            textAlign: TextAlign.center,
+            softWrap: false,
+          )),
+          Expanded(child: Text("$col3", style: style, 
+            textAlign: TextAlign.center,
+            softWrap: false,
+          )),
+        ],
+      ),
+    );
   }
 
 }

@@ -6,12 +6,14 @@ class MessageScreen extends StatelessWidget {
   final String? avatar;
   final String? title;
   final String message;
+  final VoidCallback? onRestart;
 
   const MessageScreen({ 
     Key? key,
     this.avatar,
     this.title,
     this.child,
+    this.onRestart,
     required this.message
   }) : super(key: key);
 
@@ -44,11 +46,26 @@ class MessageScreen extends StatelessWidget {
           Text(message, 
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 32,
+              fontSize: 30,
               color: Colors.white,
               fontWeight: FontWeight.bold
             )
-          )
+          ),
+          if(onRestart != null) Container(
+            margin: const EdgeInsets.only(top: 10),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Colors.blue,
+                fixedSize: Size(180, 40),
+                textStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16
+                ),
+              ),
+              child: Text("Reiniciar Partida"),
+              onPressed: onRestart, 
+            ),
+          ),
         ],
       ),
     );

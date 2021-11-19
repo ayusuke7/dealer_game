@@ -61,7 +61,15 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
     );
     _client?.sendMessage(message);
   }
- 
+  
+  void _onTapRestart(){
+    var message = Message(
+      type: "restart", 
+      data: _player?.toJson()
+    );
+    _client?.sendMessage(message);
+  }
+
   void _conectServer() async {
     
       _client = Client(
@@ -197,7 +205,8 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
       component = MessageScreen(
         avatar: _player?.asset,
         title: "!! Parabéns !!",
-        message: "Você conseguiu ser \no mais BURRO da sua turma."
+        message: "Você conseguiu ser o mais BURRO da sua turma.",
+        onRestart: _onTapRestart,
       );
     }else{
       component = Column(

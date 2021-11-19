@@ -1,15 +1,17 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_truco/models/card.dart';
+import 'package:flutter_truco/models/placar.dart';
 
 class Player {
+
+  final Placar placar = new Placar();
 
   final String name;
   final int number;
   final bool auto;
 
   List<CardModel> _cards = [];
-  
   String? asset;
 
   Player({  
