@@ -35,6 +35,7 @@ class _GameTrucoState extends State<GameTruco> {
   int vez = 1, mao = 1, eqp1 = 0, eqp2 = 0, vale = 1;
   
   bool visible = false;
+  bool playing = false;
 
   void _sendBroadcastMesa([bool delay = false]) async {
     
@@ -329,16 +330,12 @@ class _GameTrucoState extends State<GameTruco> {
 
     switch (message.type) {
       case "connect":
-        var player = Player.fromJson(message.data);
-        setState(() {
-          players.addAll([
-            player,
-            new Player(name: "BOT 2", number: 2, auto: true),
-            new Player(name: "BOT 3", number: 3, auto: true),
-            new Player(name: "BOT 4", number: 4, auto: true),
-          ]);
-
-        });
+        if(players.length < 4){
+          var player = Player.fromJson(message.data);
+          setState(() {
+            players.add(player);
+          });
+        }
         break;
       case "disconect":
         var player = Player.fromJson(message.data);
