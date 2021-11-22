@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_truco/components/card_game.dart';
+import 'package:flutter_truco/components/custom_button.dart';
 import 'package:flutter_truco/components/message_screen.dart';
 import 'package:flutter_truco/io/client.dart';
 import 'package:flutter_truco/io/message.dart';
@@ -33,11 +34,23 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
   bool vez = false;
   bool running = false;
   bool loading = false;
+  bool truco = false;
+  bool visible = false;
 
   void _onTapVirar(){
     setState(() {
       select!.flip = !select!.flip;
     });
+  }
+ 
+  void _onTapTruco(){
+    var message = Message(
+      type: "truco", 
+      data: player?.toJson()
+    );
+
+    client?.sendMessage(message);
+
   }
 
   void _onTapCard(){
@@ -60,7 +73,7 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
     
     setState(() {
       player?.removeCard(card);
-      mesa.vez = 0;
+      mesa.vez = null;
       select = null;
     });
 
@@ -86,7 +99,7 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
       client?.connect().then((_){
         if(client!.connected){
           var play = Player(
-            number: client.hashCode,
+            number: 0,
             asset: "${widget.model?.avatar}",
             name: "${widget.model?.name}",
           );
@@ -132,6 +145,9 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
         var tmp = MesaModel.fromJson(message.data);
         setState(() { mesa = tmp; });
         break;
+      case "truco": 
+        print(message.data);
+        break;
       case "disconect": 
         Navigator.of(context).pop();
         break;
@@ -155,6 +171,7 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
   @override
   Widget build(BuildContext context) {
     var cards = player?.cards ?? [];
+    var vez = mesa.vez == player?.number;
 
     var component;
 
@@ -211,12 +228,14 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: cards.map((card) {
+                var sel = select?.uui == card.uui;
                 return CardGame(
+                  selected: sel,
                   card: card,
-                  visible: true,
-                  selected: select?.uui == card.uui,
                   onTap: () {
-                    setState(() => select = card);
+                    setState(() {
+                      select = card;
+                    });
                   },
                 );
               }).toList()
@@ -228,46 +247,28 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextButton.icon(
-                  onPressed: (){}, 
-                  icon: Icon(Icons.bolt),
-                  label: Text("Trucar"),
-                  style: TextButton.styleFrom(
-                    minimumSize: Size(150, 40),
-                    backgroundColor: Colors.red[400],
-                    primary: Colors.white,
-                    textStyle: TextStyle(
-                      fontSize: 16
-                    )
-                  ),
+                CustomButton(
+                  disable: !vez,
+                  onPressed: _onTapTruco, 
+                  icon: Icons.bolt,
+                  label: mesa.labelValor,
+                  backgroundColor: Colors.red[400],
                 ),
                 const SizedBox(width: 15),
-                TextButton.icon(
+                CustomButton(
+                  disable: !vez && !truco,
                   onPressed: _onTapCard, 
-                  icon: Icon(Icons.arrow_circle_up),
-                  label: Text("Jogar"),
-                  style: TextButton.styleFrom(
-                    minimumSize: Size(150, 40),
-                    backgroundColor: Colors.blue[400],
-                    primary: Colors.white,
-                    textStyle: TextStyle(
-                      fontSize: 16
-                    )
-                  ),
+                  icon: Icons.arrow_circle_up,
+                  label: "Jogar",
+                  backgroundColor: Colors.blue[400],
                 ),
                 const SizedBox(width: 15),
-                TextButton.icon(
+                CustomButton(
+                  disable: select == null,
                   onPressed: _onTapVirar, 
-                  icon: Icon(Icons.rotate_left),
-                  label: Text("Vira"),
-                  style: TextButton.styleFrom(
-                    minimumSize: Size(150, 40),
-                    backgroundColor: Colors.purple[400],
-                    primary: Colors.white,
-                    textStyle: TextStyle(
-                      fontSize: 16
-                    )
-                  ),
+                  icon: Icons.rotate_left,
+                  label: "Vira",
+                  backgroundColor: Colors.purple[400],
                 ),
               ],
             ),

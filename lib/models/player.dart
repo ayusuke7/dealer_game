@@ -7,17 +7,17 @@ class Player {
 
   final Placar placar = new Placar();
 
-  final String name;
   final int number;
   final bool auto;
 
   List<CardModel> _cards = [];
   String? asset;
+  String? name;
 
-  Player({  
-    required this.name,
+  Player({
     required this.number,
     this.auto = false,
+    this.name,
     this.asset,
   });
 
@@ -85,10 +85,19 @@ class Player {
     return "$asset";
   }
 
+  String get getName {
+    if(name != null) return "$name";
+    return "BOT $number";
+  }
+
+  int get equipe => number % 2 + 1;
+
   CardModel randomCard({ List<CardModel>? jogadas }){
     
-    if(cards.length == 1) return _cards[0];
+    if(cards.length == 1) return _cards.first;
+
     var i = Random.secure().nextInt(_cards.length);
+    
     return _cards[i];
   }
 

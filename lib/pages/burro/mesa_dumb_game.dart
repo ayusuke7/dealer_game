@@ -1,3 +1,4 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_truco/commons/strings.dart';
 import 'package:flutter_truco/components/card_game.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_truco/models/card.dart';
 import 'package:flutter_truco/models/mesa.dart';
 import 'package:flutter_truco/models/player.dart';
 import 'package:flutter_truco/utils/dealer.dart';
+import 'package:flutter_truco/utils/helper.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 
@@ -128,6 +130,76 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
     _sendBroadcastMesa();
   }
 
+  void _showInputIpServer() async {
+    final text = await showTextInputDialog(
+      context: context,
+      title: "IP do Servidor!",
+      message: "Não foi possivel configurar o IP do Servidor!\nPor favor, Informe manualmente!",
+      textFields: [
+        DialogTextField(
+          hintText: "Ex: 192.169.1.2", 
+          keyboardType: TextInputType.number,
+          validator: (value){
+            var valid = Helper.isIpv4(value);
+            return valid ? null : "IP Inválido";
+          }
+        ),
+      ],
+    );
+
+    if(text != null && text.isNotEmpty){
+      _createServer(text.first);
+    }
+  }
+
+  void _showDialogRegras(){
+    showDialog(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        contentPadding: EdgeInsets.all(20.0),
+        title: Text("Regras", textAlign: TextAlign.center),
+        children: BURRO_RULES.map((text) {
+          return Text(text, style: TextStyle(
+            fontSize: 16.0
+          ));
+        }).toList(),
+      )
+    );
+  }
+
+  void _showLogPartida(){
+    showDialog(
+      context: context, 
+      builder: (ctx){
+        return AlertDialog(
+          scrollable: true,
+          title: Text("Logs das Partidas"),
+          content: Container(
+            width: MediaQuery.of(context).size.width / 2,
+            child: Column(
+              children: logs.map((log) => Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                child: Text("$log"),
+              )).toList(),
+            ),
+          ),
+        );
+      }
+    );
+  }
+
+  void _exitServer() async {
+    if(server != null){
+      server?.broadcast(Message(
+        type: "disconect", 
+        data: null
+      ));
+      await server?.stop();
+    }
+    
+    Navigator.pop(context);
+  }
+
   void _createServer([String? ip]) async {
     
     var ipServer = ip ?? await network.getWifiIP();
@@ -239,102 +311,6 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
         break;
     }
   }
-   
-  void _showInputIpServer(){
-    showDialog(
-      barrierDismissible: false,
-      context: context, 
-      builder: (ctx){
-        return SimpleDialog(
-          contentPadding: EdgeInsets.all(20),
-          children: [
-            Text("Não foi possivel configurar o IP do Servidor!\nPor favor, Informe manualmente!",
-              style: TextStyle(fontSize: 18, height: 1.4),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 20),
-              child: TextFormField(
-                controller: edit,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  fillColor: Colors.white,
-                  focusColor: Colors.white,
-                  filled: true,
-                  hintText: "Ex: 192.169.1.2",
-                  border: OutlineInputBorder()
-                ),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: Colors.blue,
-                fixedSize: Size(200, 60),
-                textStyle: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18
-                ),
-              ),
-              child: Text("Iniciar Servidor"),
-              onPressed: (){
-                if(edit.text.isNotEmpty){
-                  Navigator.of(ctx).pop();
-                  _createServer(edit.text.trim());
-                }
-              }, 
-            )
-          ],
-        );
-      }
-    );
-  }
-
-  void _showDialogRegras(){
-    showDialog(
-      context: context,
-      builder: (ctx) => SimpleDialog(
-        contentPadding: EdgeInsets.all(20.0),
-        title: Text("Regras", textAlign: TextAlign.center),
-        children: BURRO_RULES.map((text) {
-          return Text(text, style: TextStyle(
-            fontSize: 16.0
-          ));
-        }).toList(),
-      )
-    );
-  }
-
-  void _showLogPartida(){
-    showDialog(
-      context: context, 
-      builder: (ctx){
-        return AlertDialog(
-          scrollable: true,
-          title: Text("Logs das Partidas"),
-          content: Container(
-            width: MediaQuery.of(context).size.width / 2,
-            child: Column(
-              children: logs.map((log) => Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                child: Text("$log"),
-              )).toList(),
-            ),
-          ),
-        );
-      }
-    );
-  }
-
-  void _exitServer() async {
-    if(server != null){
-      server?.broadcast(Message(
-        type: "disconect", 
-        data: null
-      ));
-      await server?.stop();
-    }
-    
-    Navigator.pop(context);
-  }
 
   @override
   void initState() {
@@ -352,10 +328,6 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     var widthOpt = size.width * 0.3;
-
-    var notEmptys = mesa.running 
-      ? players.where((e) => e.cards.isNotEmpty) 
-      : players;
 
     var style = TextStyle(
       fontSize: 16,
@@ -376,7 +348,7 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                 children: [
 
                   if(!mesa.running) Positioned(
-                    top: size.height / 2,
+                    top: size.height / 2 - 50,
                     child: Text("Aguardando mais de\n2 Jogadores",
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.white,fontSize: 16)
@@ -406,20 +378,37 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                         spacing: 10.0,
                         runSpacing: 10.0,
                         alignment: WrapAlignment.center,
-                        children: notEmptys.map((p) => Column(
-                          children: [
-                            Text("${p.name} (${p.cards.length})", style: TextStyle(
-                              color: Colors.white,
-                            )),
-                            CircleAvatar(
-                              maxRadius: 35,
-                              backgroundColor: p.number == mesa.vez ? Colors.yellow : null,
-                              child: Image.asset("${p.asset}", 
-                                fit: BoxFit.contain
+                        children: players.map((p) {
+                          var overlay, select;
+                          if(mesa.running && p.cards.isEmpty){
+                            overlay = Container(
+                              width: 65, height: 65, 
+                              decoration: BoxDecoration(
+                                color: Colors.black,
+                                shape: BoxShape.circle,
+                                backgroundBlendMode: BlendMode.saturation
                               ),
-                            ),
-                          ],
-                        )).toList(),
+                            );
+                          }
+                          if(p.number == mesa.vez){
+                            select = Colors.yellow;
+                          }
+                          return Column(
+                            children: [
+                              Text("${p.name} (${p.cards.length})",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                )
+                              ),
+                              CircleAvatar(
+                                maxRadius: 35,
+                                child: overlay,
+                                backgroundColor: select,
+                                backgroundImage: AssetImage("${p.asset}"),
+                              ),
+                            ],
+                          );
+                        }).toList(),
                       ),
                     )
                   ),
@@ -437,19 +426,6 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                     Expanded(
                       child: ListView(
                         children: [
-                          TextButton.icon(
-                            icon: Icon(Icons.info_outline), 
-                            label: Text("Regras"),
-                            style: TextButton.styleFrom(
-                              primary: Colors.white
-                            ),
-                            onPressed: _showDialogRegras, 
-                          ),
-                          CardGame(
-                            disabled: deck.isEmpty,
-                            margin: EdgeInsets.only(top: 10, bottom: 20),
-                          ),
-                          Divider(color: Colors.white),
                           ListTile(
                             title: Text("Servidor", style: style),
                             subtitle: server != null 
@@ -463,23 +439,37 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
                             ),
                             onTap: _showLogPartida,
                           ),
+                          Divider(color: Colors.white),
+                          ListTile(
+                            title: Text("Regras", style: style),
+                            trailing: Icon(Icons.info_outline, color: Colors.white),
+                            onTap: _showDialogRegras,
+                          ),
                           ListTile(
                             title: Text("Baralho", style: style),
-                            trailing: Text("${deck.length}", style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold
-                            )),
-                          ),
-                          Divider(color: Colors.white),
-                          _buildLineRow("Jogad", "Burro", "Vence"),
-                          
-                          for (var player in players) 
-                            _buildLineRow(
-                              player.name, 
-                              "${player.placar.looser}",
-                              "${player.placar.winner}",
+                            trailing: Text(mesa.running ? "${deck.length}" : "40", 
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold
+                              )
                             ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(top: 15.0),
+                            color: Colors.white.withOpacity(.3),
+                            child: Column(
+                              children: [
+                                 _buildLineRow("Jogad", "Venced", "Burro", border: false),
+                                for (var player in players) 
+                                  _buildLineRow(
+                                    "${player.name}", 
+                                    "${player.placar.winner}",
+                                    "${player.placar.looser}",
+                                  ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -521,18 +511,21 @@ class _MesaDumbGameState extends State<MesaDumbGame> {
     );
   }
 
-  Widget _buildLineRow(String col1, String col2, String col3){
+  Widget _buildLineRow(String col1, String col2, String col3, {
+    bool border = true
+  }){
     var style = TextStyle(
       fontSize: 16,
       color: Colors.white,
       fontWeight: FontWeight.bold
     );
     return  Container(
-      margin: const EdgeInsets.only(bottom: 7.0),
-      padding: const EdgeInsets.only(bottom: 7.0),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.white))
+      padding: const EdgeInsets.symmetric(
+        vertical: 10.0
       ),
+      decoration: border ? BoxDecoration(
+        border: Border(top: BorderSide(color: Colors.white))
+      ) : null,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

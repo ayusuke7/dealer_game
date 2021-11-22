@@ -30,8 +30,6 @@ class Client {
       socket = await Socket.connect(host, port);
       socket?.listen(_listenData,
         onDone: disconnect,
-        onError: onError,
-        cancelOnError: false,
       );
       connected = true;
     } catch (exception) {
@@ -43,7 +41,7 @@ class Client {
   void _listenData(Uint8List uint8){
     var data = json.decode(String.fromCharCodes(uint8));
     var message = Message.fromJson(data);
-    this.onData(message);
+    onData(message);
   }
 
   void sendMessage(Message message) {

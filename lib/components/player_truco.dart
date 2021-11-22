@@ -94,7 +94,7 @@ class _PlayerTrucoState extends State<PlayerTruco> {
                       )
                     ],
                   )
-                : Text(widget.player.name, style: TextStyle(
+                : Text("${widget.player.name}", style: TextStyle(
                     fontSize: 16, 
                     color: Colors.white
                   )),

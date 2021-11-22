@@ -31,9 +31,8 @@ class Storage {
     return save(mode, "$value");
   }
   
-  static Future<bool> getMode() async {
-    var data = await gett(mode);
-    return data == "true";
+  static Future<String?> getMode() async {
+    return await gett(mode);
   }
   
   static Future<bool> saveModelPlayer(CreatePlayerModel model){

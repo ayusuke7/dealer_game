@@ -83,14 +83,18 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   void _getStorage() async {
+    
     var mode = await Storage.getMode();
-    if(mode){
+    var isPlayer = mode == null || mode == "true";
+      
+    if(isPlayer){
       _getModelPlayer();
     }else{
       setState(() {
-        modePlayer = mode;
+        modePlayer = false;
       });
     }
+    
   }
  
   @override
