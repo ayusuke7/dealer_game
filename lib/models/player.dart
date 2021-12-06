@@ -38,18 +38,15 @@ class Player {
 
   void setCards(List<CardModel> newCards, {CardModel? vira}){
     this._cards = newCards.map((e){
-      
       var card = CardModel(
         naipe: e.naipe, 
         value: e.value,
         player: number,
       );
-
       if(vira != null){
         var manil =  vira.value == 13 ? 4 : vira.value + 1;
         card.manil = e.value == manil;
       }
-
       return card;
     }).toList();
   }

@@ -137,8 +137,9 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
       case "cards":
         var cards = listCardFromJson(message.data);
         setState(() {
-          player?.setCards(cards);
           running = true;
+          player?.number = cards.first.player;
+          player?.setCards(cards);
         });
         break;
       case "mesa": 
@@ -264,7 +265,7 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
                 ),
                 const SizedBox(width: 15),
                 CustomButton(
-                  disable: select == null || mesa.escuro,
+                  disable: select == null || mesa.escuro || mesa.mao == 1,
                   onPressed: _onTapVirar, 
                   icon: Icons.rotate_left,
                   label: "Vira",
