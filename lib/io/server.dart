@@ -27,7 +27,7 @@ class Server {
         socket.listen((Uint8List uint8){
           var data = String.fromCharCodes(uint8);
           var message = Message.fromJson(json.decode(data));
-          this.onData(message);
+          message.host = socket.address.host;
           
           if(message.type == "connect"){
             sockets.add(socket);
@@ -38,6 +38,7 @@ class Server {
             print("client disconect ${message.data}");
           }
 
+          this.onData(message);
         });
       });
       this.running = true;

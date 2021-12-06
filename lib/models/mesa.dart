@@ -11,11 +11,13 @@ class MesaModel {
   int deck;
   int jogadas;
   bool running;
+  bool escuro;
 
   MesaModel({ 
     this.deck = 0,
     this.jogadas = 0,
     this.valendo = 1,
+    this.escuro = false,
     this.running = false,
     this.naipe,
     this.vez,
@@ -60,6 +62,7 @@ class MesaModel {
     jogadas: json["jogadas"],
     vencedor: json["vencedor"],
     valendo: json["valendo"],
+    escuro: json["escuro"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -71,6 +74,7 @@ class MesaModel {
     "running": running,
     "jogadas": jogadas,
     "vencedor": vencedor,
+    "escuro": escuro,
     "valendo": valendo,
   };
 }

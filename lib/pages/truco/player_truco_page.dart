@@ -99,7 +99,7 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
       client?.connect().then((_){
         if(client!.connected){
           var play = Player(
-            number: 0,
+            number: client.hashCode,
             asset: "${widget.model?.avatar}",
             name: "${widget.model?.name}",
           );
@@ -248,7 +248,7 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CustomButton(
-                  disable: !vez,
+                  disable: !vez || mesa.escuro,
                   onPressed: _onTapTruco, 
                   icon: Icons.bolt,
                   label: mesa.labelValor,
@@ -264,7 +264,7 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
                 ),
                 const SizedBox(width: 15),
                 CustomButton(
-                  disable: select == null,
+                  disable: select == null || mesa.escuro,
                   onPressed: _onTapVirar, 
                   icon: Icons.rotate_left,
                   label: "Vira",

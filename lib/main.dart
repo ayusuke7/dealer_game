@@ -5,9 +5,10 @@ import 'package:flutter_truco/pages/menu_page.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight])
-      .then((_) {
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeLeft, 
+    DeviceOrientation.landscapeRight
+  ]).then((_) {
     runApp(MyApp());
   });
 }

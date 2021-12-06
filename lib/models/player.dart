@@ -7,18 +7,20 @@ class Player {
 
   final Placar placar = new Placar();
 
-  final int number;
-  final bool auto;
-
   List<CardModel> _cards = [];
   String? asset;
   String? name;
+  String? host;
+  
+  bool auto;
+  int number;
 
   Player({
     required this.number,
     this.auto = false,
     this.name,
     this.asset,
+    this.host
   });
 
   List<CardModel> get cards => _cards;
@@ -34,7 +36,7 @@ class Player {
     _cards.forEach((e) => print("${e.detail}"));
   }
 
-  void setCards(List<CardModel> newCards, [CardModel? vira]){
+  void setCards(List<CardModel> newCards, {CardModel? vira}){
     this._cards = newCards.map((e){
       
       var card = CardModel(
@@ -106,6 +108,7 @@ class Player {
       number: json["number"],
       auto: json["auto"],
       asset: json["asset"],
+      host: json["host"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -113,6 +116,7 @@ class Player {
       "number": number,
       "auto": auto,
       "asset": asset,
+      "host": host,
   };
 
 }
