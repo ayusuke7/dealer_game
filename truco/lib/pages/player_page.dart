@@ -257,7 +257,7 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
                 ),
                 const SizedBox(width: 15),
                 CustomButton(
-                  disable: !vez && !truco,
+                  disable: !vez,
                   onPressed: _onTapCard, 
                   icon: Icons.arrow_circle_up,
                   label: "Jogar",
