@@ -7,11 +7,13 @@ class CreatePlayer extends StatefulWidget {
 
   final CreatePlayerModel? model;
   final Function(CreatePlayerModel model) onTapSave;
+  final Function(CreatePlayerModel model) onTapConnect;
 
   const CreatePlayer({ 
     Key? key,
     this.model,
     required this.onTapSave,
+    required this.onTapConnect,
   }) : super(key: key);
 
   @override
@@ -46,7 +48,7 @@ class _CreatePlayerState extends State<CreatePlayer> {
 
   }
 
-  void _onConnect(){
+  void _onConnectOrSave({ bool save = false }){
       if(
         _avatar != null && 
         _host.text.trim().isNotEmpty && 
@@ -59,7 +61,11 @@ class _CreatePlayerState extends State<CreatePlayer> {
             name: _name.text.trim()
           );
           
-          widget.onTapSave(model);        
+          if(save){
+            widget.onTapSave(model);
+          }else{
+            widget.onTapConnect(model);
+          }
       } else {
         Fluttertoast.showToast(
           msg: "Preencha os campos!",
@@ -93,78 +99,100 @@ class _CreatePlayerState extends State<CreatePlayer> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    var left = size.width * 0.5;
+    var right = size.width * 0.3;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          width: size.width * 0.5,
+          width: left,
           padding: EdgeInsets.all(5.0),
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            children: _assets.map((img) => GestureDetector(
-              onTap: (){
-                setState(() => _avatar = img);
-              },
-              child: CircleAvatar(
-                child: Image.asset(img),
-                radius: 40,
-                backgroundColor: _avatar == img 
-                  ? Colors.yellow 
-                  : Colors.transparent,
-              ),
-            )).toList(),
+          child: SingleChildScrollView(
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              children: _assets.map((img) => GestureDetector(
+                onTap: (){
+                  setState(() => _avatar = img);
+                },
+                child: CircleAvatar(
+                  child: Image.asset(img),
+                  radius: 40,
+                  backgroundColor: _avatar == img 
+                    ? Colors.yellow 
+                    : Colors.transparent,
+                ),
+              )).toList(),
+            ),
           ),
         ),
         Container(
-          width: size.width * 0.3,
+          width: right,
           padding: EdgeInsets.all(5.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text("Player", 
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: "Gameria",
-                  letterSpacing: 5.0,
-                  color: Colors.white,
-                  fontSize: 28,
-                )
-              ),
-              const SizedBox(height: 30),
-              TextFormField(
-                controller: _name,
-                decoration: InputDecoration(
-                  fillColor: Colors.white,
-                  focusColor: Colors.white,
-                  filled: true,
-                  hintText: "Nome do Jogador"
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text("Player", 
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: "Gameria",
+                    letterSpacing: 5.0,
+                    color: Colors.white,
+                    fontSize: 28,
+                  )
                 ),
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _host,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  fillColor: Colors.white,
-                  focusColor: Colors.white,
-                  filled: true,
-                  hintText: "IP do Servidor"
+                const SizedBox(height: 30),
+                TextFormField(
+                  controller: _name,
+                  decoration: InputDecoration(
+                    fillColor: Colors.white,
+                    focusColor: Colors.white,
+                    filled: true,
+                    hintText: "Nome do Jogador"
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: _onConnect,
-                icon: Icon(Icons.save),
-                label: Text("Salvar"),
-                style: ElevatedButton.styleFrom(
-                  fixedSize: Size(size.width / 3, 50),
-                  primary: Colors.blue,
-                  textStyle: TextStyle(fontSize: 16),
-                )
-              )
-            ],
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _host,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    fillColor: Colors.white,
+                    focusColor: Colors.white,
+                    filled: true,
+                    hintText: "IP do Servidor"
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton.icon(
+                  onPressed: (){
+                    _onConnectOrSave(save: true);
+                  },
+                  icon: Icon(Icons.save),
+                  label: Text("Salvar"),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.blue,
+                    fixedSize: Size(right, 40),
+                    textStyle: TextStyle(fontSize: 16),
+                  )
+                ),
+                const SizedBox(height: 10),
+                if(widget.model != null) ElevatedButton.icon(
+                  onPressed: (){
+                    _onConnectOrSave();
+                  },
+                  icon: Icon(Icons.bolt),
+                  label: Text("Conectar"),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green,
+                    fixedSize: Size(right, 40),
+                    textStyle: TextStyle(fontSize: 16),
+                  )
+                ),
+              ],
+            ),
           ),
         ),
       ],

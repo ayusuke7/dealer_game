@@ -80,7 +80,7 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
   }
 
   void _conectServer() async {
-    
+   
       client = Client(
         port: 4545,
         host: "${widget.model?.host}", 
@@ -149,7 +149,8 @@ class _PlayerTrucoGameState extends State<PlayerTrucoGame> {
       case "truco": 
         print(message.data);
         break;
-      case "disconect": 
+      case "disconect":
+        setState(() { client = null; });
         Navigator.of(context).pop();
         break;
       default:

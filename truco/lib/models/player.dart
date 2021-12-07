@@ -27,7 +27,7 @@ class Player {
 
   Color get color {
 
-    if(number == 1 || number == 3) return Colors.blue;
+    if(number == 0 || number == 2) return Colors.blue;
 
     return Colors.red;
   }
