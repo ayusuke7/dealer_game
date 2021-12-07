@@ -246,8 +246,8 @@ class _PlayerDumbPageState extends State<PlayerDumbPage> {
                   color: Colors.white,
                   fontWeight: FontWeight.bold
                 )),
-                _mesa.asset != null
-                  ? Image.asset("assets/images/${_mesa.asset}", width: 25)
+                _mesa.naipeAsset != null
+                  ? Image.asset("assets/images/${_mesa.naipeAsset}", width: 25)
                   : Icon(Icons.help_outline, color: Colors.white, size: 25),
                 const SizedBox(width: 10),
               ],
