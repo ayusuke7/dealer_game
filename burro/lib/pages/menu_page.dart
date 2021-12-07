@@ -4,7 +4,6 @@ import 'package:flutter_truco/models/create_player.dart';
 import 'package:flutter_truco/pages/player_page.dart';
 import 'package:flutter_truco/pages/mesa_game.dart';
 import 'package:flutter_truco/utils/storage.dart';
-import 'package:flutter_switch/flutter_switch.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({ Key? key }) : super(key: key);

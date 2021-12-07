@@ -39,6 +39,7 @@ class _GameTrucoState extends State<GameTruco> {
   CardModel? vira, winner;
   int eqp1 = 0, eqp2 = 0, vale = 1, ini = 0;
   bool visible = false, playing = false;
+  
 
   void _startGame() async {
     setState(() {
@@ -83,7 +84,10 @@ class _GameTrucoState extends State<GameTruco> {
       target2 = 3;
     }
 
-    var message = Message(type: "truco", data: "teste de string");
+    var message = Message(
+      type: "truco", 
+      data: "teste de string"
+    );
 
     if (!players[target1].auto) server?.sendIndex(target1, message);
 
